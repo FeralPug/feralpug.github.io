@@ -129,13 +129,13 @@
 
     void SetUpCamera()
     {
-    var bounds = groundRenderer.bounds;
+        var bounds = groundRenderer.bounds;
 
-    cam.orthographic = true;
+        cam.orthographic = true;
 
-    cam.orthographicSize = bounds.size.x * 0.5f;
+        cam.orthographicSize = bounds.size.x * 0.5f;
 
-    cam.transform.position = bounds.center + Vector3.up * 10f;
+        cam.transform.position = bounds.center + Vector3.up * 10f;
     }
     }
 </code></pre>

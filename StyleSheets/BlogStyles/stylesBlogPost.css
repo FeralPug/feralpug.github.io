@@ -22,17 +22,16 @@ aside a:hover{
 }
 
 pre {
+    max-width: 100%;
     overflow: scroll;
     padding: 10px;
     border: 2px solid black;
     border-radius: 2px;
 }
 
-code{
+code {
     font-size: 1.6rem;
+    min-width: 0px;
 }
 
-.CodeHighlight{
-    max-width: 100%;
-}
 
