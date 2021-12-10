@@ -22,6 +22,7 @@ aside a:hover{
 }
 
 pre {
+    min-width: 0px;
     max-width: 100%;
     overflow: scroll;
     padding: 10px;
@@ -34,4 +35,11 @@ code {
     min-width: 0px;
 }
 
+article {
+    min-width: 0px;
+}
+
+main {
+    min-width: 0px;
+}
 
