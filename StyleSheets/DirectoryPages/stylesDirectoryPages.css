@@ -15,16 +15,15 @@
 .DirectoryContainer ul {
     list-style: none;
     padding: 0px;
-    margin: 20px;
+}
+
+.DirectoryContainer li{
+    margin: 20px 0px;
 }
 
 /*
     this is where we style the actual items
 */
-
-.DirectoryContainer li {
-    margin: 20px;
-}
 
 /*
     each item has an image and text,
@@ -58,7 +57,7 @@
 */
 
 .DirectoryItemText {
-    margin: 0px 20px;
+    margin: 0px 5px;
 }
 
 .DirectoryContainer h3 {
@@ -81,21 +80,14 @@
 
 .DirectoryContainer li.ContactListItem {
     display: block;
-    max-width: 100%;
+
 }
 
 .ContactForm {
     border: 1px solid black;
-    padding: 20px;
-    display: flex;
-    align-content: center;
-    justify-content: space-around;
-    margin: 0px 50px;
-    margin-top: 50px;
-}
-
-.ContactForm form{
-    width: 80%;
+    padding: 5px;
+    margin-right: 5px;
+    margin-left: 5px;
 }
 
 .ContactForm h2 {
@@ -109,7 +101,8 @@
 
 .ContactForm .ContactEmailInput{
     display: flex;
-    margin: 10px 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .ContactEmailInput input {
@@ -118,9 +111,9 @@
 }
 
 .ContactForm textarea{
-    width: 100%;
-    max-width: 100%;
+    width: 98%;
     min-height: 200px;
+    max-width: 98%
 }
 
 .ContactSubmitButtonContainer {
@@ -144,11 +137,22 @@
         set the list items to flex so we can put the image and text next to each other instead of on top of each other
     */
 
+    .DirectoryContainer ul {
+        margin: 20px;
+    }
+
     .DirectoryContainer li {
         display: flex;
+        align-content: center;
+        justify-content: space-around;
+        margin: 20px;
     }
 
     /* set the image container to block so that it doesnt justify the image content inside*/
+    .DirectoryItemText {
+        margin: 0px 20px;
+    }
+
     .DirectoryItemImage {
         display: block;
     }
@@ -176,5 +180,19 @@
     .DirectoryContainer h3 {
         margin-top: 0px;
         text-align: left;
+    }
+
+    /*
+        contact form
+    */
+
+    .ContactForm form {
+        margin: 10px;
+    }
+
+    .ContactForm textarea {
+        width: 100%;
+        min-height: 200px;
+        max-width: 100%
     }
 }
