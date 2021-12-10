@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Feral_Pug Codes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../../../../../../StyleSheets/EveryPage/stylesGeneral.css" />
+    <link rel="stylesheet" href="../../../../../../StyleSheets/BlogStyles/stylesBlogPost.css"/>
+</head>
+<body>
+    <header>
+        <div class="Banner" id="Top">Feral_Pug Codes</div>
+    </header>
+
+    <div class="SocialNav">
+        <ul>
+            <li>
+                <a href="https://ko-fi.com/feral_pug" title="Link to my Ko-fi page" target="_blank">
+                    <img src="../../../../../../Media/Icons/Ko-fiLogo.png" alt="Ko-Fi Logo" width="32" />
+                </a>
+            </li>
+            <li>
+                <a href="https://twitter.com/Feral_Pug" title="Link to my twitter page" target="_blank">
+                    <img src="../../../../../../Media/Icons/twitterLogo.svg" alt="Twitter Logo" width="32" />
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="NavContainer">
+        <nav>
+            <ul>
+                <li>
+                    <a href="../../../../../../Index.html">Home</a>
+                </li>
+                <li>
+                    <a href="../../../../../GamesPage/Games.html">Games</a>
+                </li>
+                <li>
+                    <a href="../../../../../Code/Code.html">Code Blog</a>
+                </li>
+                <li>
+                    <a href="../../../../../Tools/Tools.html">Tools</a>
+                </li>
+                <li>
+                    <a href="../../../../../Support/Support.html">Support</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <article>
+            <h1 id="PostStart">
+                Post Title
+            </h1>
+
+            <p class="PageText">
+                Here is an example post. I am going to detail how to make something and it will be cool.
+            </p>
+
+            <h2 id="Part1">Part 1</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+            <h2 id="Part2">Part 2</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+            <h2 id="Part3">Part 3</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+            <h2 id="Part4">Part 4</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code>using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+public class SetCamera : MonoBehaviour
+{
+    public MeshRenderer groundRenderer;
+    Camera cam;
+
+    private void Awake()
+    {
+        cam = this.GetComponent&lt;Camera&gt;();
+    }
+
+    private void Start()
+    {
+        SetUpCamera();
+    }
+
+    void SetUpCamera()
+    {
+        var bounds = groundRenderer.bounds;
+        cam.orthographic = true;
+        cam.orthographicSize = bounds.size.x * 0.5f;
+        cam.transform.position = bounds.center + Vector3.up * 10f;
+    }
+}</code>
+</pre>
+
+            </div>
+
+            <h2 id="Part5">Part 5</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+            <h2 id="Part6">Part 6</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+            <h2 id="Part7">Part 7</h2>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CausticsWaterBanner.jpg" alt="Image of the final Result" />
+            </div>
+
+            <p class="PageText">
+                Hyper Flight is a bullet-hell, race against the clock, endless runner style game. Using semi-realistic flying
+                physics, fly across the terrain dodging enemies and collecting power-ups and additional time. If the clock
+                hits zero or you touch the ground, it is game over.
+            </p>
+
+
+        </article>
+
+        <div class="AsideContainer">
+            <aside>
+                <h2>Table of Contents</h2>
+                <ul>
+                    <li>
+                        <a href="#PostStart" title="Jump to start of post">
+                            Start
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part1" title="Jump to part one">
+                            Part 1
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part2" title="Jump to part two">
+                            Part 2
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part3" title="Jump to part three">
+                            Part 3
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part4" title="Jump to part four">
+                            Part 4
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part5" title="Jump to part five">
+                            Part 5
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part6" title="Jump to part six">
+                            Part 6
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part7" title="Jump to part seven">
+                            Part 7
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>
+            All resources found here are to be used freely for any projects, commercial, personal, or otherwise.
+        </p>
+    </footer>
+</body>
+</html>

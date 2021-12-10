@@ -1,0 +1,180 @@
+﻿/*
+    This container is the holder of all the different items in the directory
+    the ul in this container is where we enter the actual items
+*/
+
+.DirectoryContainer {
+    border: 5px solid black;
+    border-radius: 5px;
+}
+
+.DirectoryContainer h2 {
+    margin: 20px;
+}
+
+.DirectoryContainer ul {
+    list-style: none;
+    padding: 0px;
+    margin: 20px;
+}
+
+/*
+    this is where we style the actual items
+*/
+
+.DirectoryContainer li {
+    margin: 20px;
+}
+
+/*
+    each item has an image and text,
+    we set the image first
+*/
+
+.DirectoryItemImage{
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+}
+
+.DirectoryItemImage img {
+    width: 256px;
+    min-width: 128px;
+    max-width: 100%;
+}
+
+.DirectoryItemIcon {
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+}
+
+.DirectoryItemIcon img {
+    width: 128px;
+}
+
+/*
+    then we set the texts
+*/
+
+.DirectoryItemText {
+    margin: 0px 20px;
+}
+
+.DirectoryContainer h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.DirectoryItemText p {
+    margin: 0px;
+}
+
+/*
+    Contact Form Styles
+*/
+
+/*
+    if we have the contact form we want it to display that list item in block and not flex
+*/
+
+.DirectoryContainer li.ContactListItem {
+    display: block;
+    max-width: 100%;
+}
+
+.ContactForm {
+    border: 1px solid black;
+    padding: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+    margin: 0px 50px;
+    margin-top: 50px;
+}
+
+.ContactForm form{
+    width: 80%;
+}
+
+.ContactForm h2 {
+    text-align: center;
+    margin-top: 0px;
+}
+
+.ContactForm label{
+    font-size: 1.6rem;
+}
+
+.ContactForm .ContactEmailInput{
+    display: flex;
+    margin: 10px 0px;
+}
+
+.ContactEmailInput input {
+    flex: 3;
+    width: 100%;
+}
+
+.ContactForm textarea{
+    width: 100%;
+    max-width: 100%;
+    min-height: 200px;
+}
+
+.ContactSubmitButtonContainer {
+    display: flex;
+    align-content: center;
+    justify-content: end;
+}
+
+.ContactForm button {
+    margin-top: 10px;
+}
+
+/*
+    before set it for a mobile screen
+    this sets it for a desktop screen
+*/
+
+@media screen and (min-width: 721px) {
+
+    /* 
+        set the list items to flex so we can put the image and text next to each other instead of on top of each other
+    */
+
+    .DirectoryContainer li {
+        display: flex;
+    }
+
+    /* set the image container to block so that it doesnt justify the image content inside*/
+    .DirectoryItemImage {
+        display: block;
+    }
+
+    .DirectoryItemIcon{
+        display: block;
+    }
+
+    /* set the flex values*/
+
+    .DirectoryItemImage {
+        flex: 1;
+    }
+
+    .DirectoryItemIcon {
+        flex: 1;
+    }
+
+    .DirectoryItemText {
+        flex: 3;
+    }
+
+    /* style the text*/
+
+    .DirectoryContainer h3 {
+        margin-top: 0px;
+        text-align: left;
+    }
+}

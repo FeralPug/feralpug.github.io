@@ -1,0 +1,264 @@
+﻿/*
+    General Default Site wide styles
+*/
+
+html {
+    font-size: 10px;
+    color: black;
+    min-height: 100%;
+    background-color: #FBFAF5;
+}
+
+h1 {
+    font-size: 3.2rem;
+}
+
+h2 {
+    font-size: 2.4rem;
+}
+
+h3 {
+    font-size: 1.8rem;
+}
+
+h4 {
+    font-size: 1.6rem;
+}
+
+h5 {
+    font-size: 1.3rem;
+}
+
+h6 {
+    font-size: 1.07rem;
+}
+
+p{
+    font-size: 1.6rem;
+}
+
+/*
+    Top of Page Heading for Every Page
+*/
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.Banner {
+    font-size: 5rem;  
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+/*
+    Social Navigation Buttons
+*/
+
+.SocialNav {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    visibility: hidden;
+}
+
+.SocialNav ul{
+    float: right;
+    list-style: none;
+    display: flex;
+    padding: 5px;
+    align-items: center;
+}
+
+.SocialNav img{
+    margin: 5px;
+}
+
+/* 
+    site navigation buttons
+*/
+
+.NavContainer {
+    padding-top: 5px;
+    background-color: black;
+    color: white;
+}
+
+nav {
+    border: 5px solid black;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+nav ul {
+    list-style: none;
+    padding-left: 0px;
+}
+
+
+nav a {
+    text-decoration: none;
+    padding: 10px 10px;
+    font-size: 2.3rem;
+}
+
+nav a:visited {
+    color: white;
+    text-decoration: none;
+    padding: 10px 10px;
+    font-size: 2.3rem;
+}
+
+nav a:hover {
+    color: yellow;
+}
+
+/*
+    Main styles
+*/
+
+main {
+    margin: 0px auto;
+    padding: 0 50px;
+    max-width: 980px;
+}
+
+main h1{
+    margin: 20px auto;
+}
+
+.PageImageContainer {
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+    margin: 20px auto;
+}
+
+.PageImage {
+    width: 256px;
+    max-width: 100%;
+}
+
+.PageText {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+article a {
+    color: blue;
+}
+
+article a:visited {
+    color: blue;
+}
+
+article a:hover{
+    color: purple;
+}
+
+/*
+    Aside menu styles
+*/
+
+.AsideContainer {
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+}
+
+aside {
+    box-sizing: border-box;
+    border: solid 1px black;
+    border-radius: 3px;
+    margin: 20px;
+    padding: 5px;
+    width: 250px;
+}
+
+aside h2 {
+    text-align: center;
+    margin: 0px;
+    padding: 5px;
+}
+
+/*
+    Footer on every page
+*/
+
+footer {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    margin-top: 20px;
+}
+
+/*
+    This is setting for when on desktop. Mobile styles are default
+*/
+
+@media screen and (min-width: 721px) {
+
+    /*
+        Top nav menu and social menu
+    */
+    .NavContainer {
+        position: sticky;
+        top: 0px;
+    }
+
+    nav ul {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .current {
+        border: 1px solid white;
+    }
+
+    .SocialNav {
+        visibility: visible;
+    }
+
+    /*
+        Page content including the aside menu
+    */
+
+    main {
+        display: flex;
+    }
+
+    /*
+        The article of the page
+    */
+
+    article {
+        flex: 3;
+        margin-right: 25px;
+    }
+
+    .PageImage {
+        width: 1024px;
+    }
+
+    /*
+        the aside menu
+    */
+
+    .AsideContainer{
+        display: block;
+    }
+
+    aside {
+        flex: 1;
+        height: max-content;
+        position: sticky;
+        top: 81px;
+    }
+
+    aside h2 {
+        text-align: left;
+    }
+}

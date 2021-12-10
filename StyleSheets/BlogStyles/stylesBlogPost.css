@@ -1,0 +1,38 @@
+﻿aside ul {
+    max-width: 100%;
+    margin-top: 5px;
+    list-style: square;
+}
+
+aside li {
+    margin: 10px;
+    font-size: 1.6rem;
+}
+
+aside a {
+    color: blue;
+}
+
+aside a:visited {
+    color: blue;
+}
+
+aside a:hover{
+    color: purple;
+}
+
+pre {
+    overflow: scroll;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 2px;
+}
+
+code{
+    font-size: 1.6rem;
+}
+
+.CodeHighlight{
+    max-width: 100%;
+}
+
