@@ -108,37 +108,37 @@
                 hits zero or you touch the ground, it is game over.
             </p>
 
-            <pre><code>
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
-
-    public class SetCamera : MonoBehaviour
-    {
+            <div class="CodeHighlight">
+<pre>
+<code>using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+public class SetCamera : MonoBehaviour
+{
     public MeshRenderer groundRenderer;
     Camera cam;
+
     private void Awake()
     {
-    cam = this.GetComponent&lt;Camera&gt;();
+        cam = this.GetComponent&lt;Camera&gt;();
     }
 
     private void Start()
     {
-    SetUpCamera();
+        SetUpCamera();
     }
 
     void SetUpCamera()
     {
         var bounds = groundRenderer.bounds;
-
         cam.orthographic = true;
-
         cam.orthographicSize = bounds.size.x * 0.5f;
-
         cam.transform.position = bounds.center + Vector3.up * 10f;
     }
-    }
-</code></pre>
+}</code>
+</pre>
+
+            </div>
 
             <h2 id="Part5">Part 5</h2>
 
