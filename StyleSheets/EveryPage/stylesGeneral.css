@@ -142,13 +142,33 @@ main h1{
 .PageImage {
     width: auto;
     max-width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-
-.PageImageText{
-    margin: 0px;
+.PageImageText {
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     color: darkslategray;
     text-align: center;
+}
+
+.ImageSideBySideContainer {
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+    margin: 20px 50px;
+}
+
+.PageSideBySide {
+    width: auto;
+    max-width: 50%;
+    margin-left: 5px;
+    margin-right: 5px;
+    flex: 1;
 }
 
 .PageText {
