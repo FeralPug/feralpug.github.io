@@ -43,8 +43,6 @@ function FixLine(additionText) {
             let markText = additionText.slice(0, additionText.length);
             let mark = new Mark(markText, true);
             marks.push(mark);
-
-            console.log("End");
         }       
     }
     //if we find a new line character we will use that index
@@ -55,8 +53,6 @@ function FixLine(additionText) {
             let markText = additionText.slice(firstIndex, lastIndex);
             let mark = new Mark(markText, true);
             marks.push(mark);
-
-            console.log(markText);
 
             //then call this function with new start and end numbers
             //we have to add one because the lastIndex will be the new line and we want to start just after it
@@ -69,8 +65,6 @@ function FixLine(additionText) {
             let newLine = additionText.slice(lastIndex, firstIndex);
             let notMark = new Mark(newLine, false);
             marks.push(notMark);
-
-            console.log(newLine);
 
             //then call this function with new start and end numbers
             //we have to add one because the lastIndex will be the new line and we want to start just after it
