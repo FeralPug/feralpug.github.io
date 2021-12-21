@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../../../../StyleSheets/BlogStyles/stylesBlogPost.css" />
     <link rel="stylesheet" href="../../../../Prism/prism.css" />
     <script src="../../../../Scripts/markFixer.js" defer></script>
+    <!--Below is hack to make prism.js only load on desktop, it is from http://www.knowledgebags.com/load-external-js-desktops-not-mobile-devices/
+        we have to do this because prism can cause chrome to crash because it is adding so many elements to the DOM tree
+        This is the original way we loaded the script <script src="../../../../Prism/prism.js" defer></script>-->
     <script>
         window.addEventListener("load", function () {
             if (window.innerWidth > 720) {
@@ -21,7 +24,6 @@
             }
         });
     </script>
-    <!--<script src="../../../../Prism/prism.js" defer></script>-->
 
 </head>
 <body>
