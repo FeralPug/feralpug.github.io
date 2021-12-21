@@ -450,7 +450,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     }
     SubShader
     {
-                <span class="addition">Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
+        <span class="addition">Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
         Cull Off ZWrite Off</span>
     
         Pass
@@ -460,7 +460,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             #pragma fragment frag
 
             #include &quot;UnityCG.cginc&quot;
-                <span class="addition">#include &quot;Lighting.cginc&quot;
+            <span class="addition">#include &quot;Lighting.cginc&quot;
             #include &quot;Includes/Scattering.cginc&quot;
 
             #pragma multi_compile_local _SUNDISK_NONE _SUNDISK_SIMPLE _SUNDISK_HIGH_QUALITY
