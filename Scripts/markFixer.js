@@ -1,7 +1,7 @@
 // JavaScript source code
 const additions = document.querySelectorAll("code .addition");
 
-marks = [];
+let marks = [];
 
 for (let i = 0; i < additions.length; i++) {
     marks = [];
@@ -27,6 +27,7 @@ for (let i = 0; i < additions.length; i++) {
         }     
     }
 }
+
 
 function FixLine(additionText) {
 
