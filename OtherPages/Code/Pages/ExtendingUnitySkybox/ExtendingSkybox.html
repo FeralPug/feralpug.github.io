@@ -8,8 +8,20 @@
     <link rel="stylesheet" href="../../../../StyleSheets/EveryPage/stylesGeneral.css" />
     <link rel="stylesheet" href="../../../../StyleSheets/BlogStyles/stylesBlogPost.css" />
     <link rel="stylesheet" href="../../../../Prism/prism.css" />
-    <!--<script src="../../../../Prism/prism.js" defer></script>-->
     <script src="../../../../Scripts/markFixer.js" defer></script>
+    <script>
+        window.addEventListener("load", function () {
+            if (window.innerWidth > 720) {
+                var theScript = document.createElement('script');
+                theScript.type = 'text/javascript';
+                theScript.src = "../../../../Prism/prism.js";
+                theScript.setAttribute("defer", "defer");
+
+                document.head.appendChild(theScript);
+            }
+        });
+    </script>
+    <!--<script src="../../../../Prism/prism.js" defer></script>-->
 
 </head>
 <body>
