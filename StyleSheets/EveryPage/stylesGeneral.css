@@ -148,6 +148,7 @@ main h1{
 .PageImageText{
     margin: 0px;
     color: darkslategray;
+    text-align: center;
 }
 
 .PageText {

@@ -35,6 +35,29 @@ code {
     min-width: 0px;
 }
 
+.addition mark.highlight {
+    background-color: yellow;
+    color: black;
+}
+
+.addition mark.highlight * {
+    background-color: yellow;
+    color: black;
+}
+
+
+q {
+    font-weight: bold;
+    color: purple;
+}
+
+.PageText code {
+    font-weight: bold;
+    color: purple;
+}
+
+
+
 article {
     min-width: 0px;
 }
