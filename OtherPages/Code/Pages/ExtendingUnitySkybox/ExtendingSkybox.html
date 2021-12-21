@@ -133,7 +133,7 @@
     https://prismjs.com/index.html -->
             <div class="CodeHighlight">
 <pre>
-<code class="language-hlsl">Shader &quot;Feral_Pug/SkyBox/MyProceduralSkybox&quot;
+<code class="language-hlsl line-numbers">Shader &quot;Feral_Pug/SkyBox/MyProceduralSkybox&quot;
 {
     Properties
     {
@@ -197,7 +197,7 @@
 
             <div class="CodeHighlight">
 <pre>
-<code class="language-hlsl">#ifndef SCATTERING
+<code class="language-hlsl line-numbers">#ifndef SCATTERING
     #define SCATTERING
 
 #endif</code>
@@ -214,7 +214,7 @@
 
             <div class="CodeHighlight">
 <pre>
-<code class="language-hlsl">#ifndef SCATTERING
+<code class="language-hlsl line-numbers">#ifndef SCATTERING
     #define SCATTERING
 
         #if defined(UNITY_COLORSPACE_GAMMA)
@@ -433,11 +433,11 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
             <div class="CodeHighlight">
 <pre>
-<code class="language-hlsl">Shader &quot;Feral_Pug/SkyBox/MyProceduralSkybox&quot;
+<code class="language-hlsl line-numbers">Shader &quot;Feral_Pug/SkyBox/MyProceduralSkybox&quot;
 {
     Properties
     {
-                <span class="addition">[KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
+        <span class="addition">[KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
         _SunSize ("Sun Size", Range(0,1)) = 0.04
         _SunSizeConvergence("Sun Size Convergence", Range(1,10)) = 5
 
