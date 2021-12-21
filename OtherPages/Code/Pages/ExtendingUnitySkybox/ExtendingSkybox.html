@@ -9,21 +9,7 @@
     <link rel="stylesheet" href="../../../../StyleSheets/BlogStyles/stylesBlogPost.css" />
     <link rel="stylesheet" href="../../../../Prism/prism.css" />
     <script src="../../../../Scripts/markFixer.js" defer></script>
-    <!--Below is hack to make prism.js only load on desktop, it is from http://www.knowledgebags.com/load-external-js-desktops-not-mobile-devices/
-        we have to do this because prism can cause chrome to crash because it is adding so many elements to the DOM tree
-        This is the original way we loaded the script <script src="../../../../Prism/prism.js" defer></script>-->
-    <script>
-        window.addEventListener("load", function () {
-            if (window.innerWidth > 720) {
-                var theScript = document.createElement('script');
-                theScript.type = 'text/javascript';
-                theScript.src = "../../../../Prism/prism.js";
-                theScript.setAttribute("defer", "defer");
-
-                document.head.appendChild(theScript);
-            }
-        });
-    </script>
+    <script src="../../../../Scripts/ScriptLoader.js" defer></script>
 
 </head>
 <body>
@@ -70,7 +56,7 @@
 
     <main>
         <article>
-            <h1 id="PostStart">
+            <h1 class="Section" id="PostStart">
                 Extending The Unity Procedural Skybox
             </h1>
 
@@ -93,7 +79,7 @@
                 <p class="PageImageText"> An example of what you can do with procedural skyboxes</p>
             </div>
 
-            <h2 id="Part1">Part 1: Background on Skies</h2>
+            <h2 class="Section" id="Part1">Part 1: Background on Skies</h2>
 
             <p class="PageText">
                 Skies in the real world have a lot of aspects to them that we can think of and try to replicate. For example, the color of the sky, the
@@ -127,7 +113,7 @@
                 shader you will be able to connect the dots. What we are going to do is extend this shader to add cool things like clouds, stars, and a textured moon object.
             </p>
 
-            <h2 id="Part2">Part 2: The Setup</h2>
+            <h2 class="Section" id="Part2">Part 2: The Setup</h2>
 
             <p class="PageText">
                 So, to get started head over to the <a href="https://unity3d.com/get-unity/download/archive" title="Link to the Unity archive" target="_blank">Unity archive</a>
@@ -718,7 +704,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                 or you will have to change the file path on the include statement for our <q>Scattering.cginc</q>.
             </p>
 
-            <h2 id="Part3">Part 3: Adding Stars</h2>
+            <h2 class="Section" id="Part3">Part 3: Adding Stars</h2>
 
             <p class="PageText">
                 The first thing we will add is stars. This is relatively simple, so it seems like a good place to start. To get stars we will use a Voronoi texture. You can
@@ -1061,7 +1047,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                 we will add. Next we will work on the procedural moon.
             </p>
 
-            <h2 id="Part4">Part 4: Adding a Moon</h2>
+            <h2 class="Section" id="Part4">Part 4: Adding a Moon</h2>
 
 
 
@@ -1123,21 +1109,6 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                     <li>
                         <a href="#Part4" title="Jump to part four">
                             Part 4
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#Part5" title="Jump to part five">
-                            Part 5
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#Part6" title="Jump to part six">
-                            Part 6
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#Part7" title="Jump to part seven">
-                            Part 7
                         </a>
                     </li>
                 </ul>
