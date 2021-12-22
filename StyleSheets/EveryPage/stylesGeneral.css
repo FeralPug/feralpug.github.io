@@ -170,7 +170,7 @@ header {
     font-size: 5rem;
     padding-bottom: 20px;
     text-align: center;
-    word-break: break-all;
+    font-weight: bold;
 }
 
 /*
@@ -247,7 +247,6 @@ main {
 
 main h1{
     margin: 20px auto;
-    word-break: break-all;
 }
 
 .PageImageContainer {
