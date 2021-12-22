@@ -164,12 +164,14 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-around;
+    max-width: 100%;
 }
 
 .Banner {
-    font-size: 5rem;  
+    font-size: 5rem;
     padding-bottom: 20px;
     text-align: center;
+    max-width: 100%;
 }
 
 /*
