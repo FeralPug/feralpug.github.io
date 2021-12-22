@@ -44,7 +44,19 @@ let callback = (entries) => {
 					}
 				}
 			}
-		}	
+		}
+		else {
+			for (let k = 0; k < tableOfContents.length; k++) {
+				var id = tableOfContents[k].firstElementChild.getAttribute("href");
+				if (id.length > 0) {
+					if (id.substring(1) === entry.target.getAttribute("id")) {
+						if (indexInView === k) {
+							indexInView = -1;
+                        }
+					}
+				}
+			}
+        }
 	})
 
 	for (let k = 0; k < tableOfContents.length; k++) {
@@ -65,14 +77,14 @@ let callback = (entries) => {
 			let windowPos = window.pageYOffset;
 			let sectionPos = sections[i].offsetTop;
 
-			distances.push(Math.abs(windowPos - sectionPos));
+			distances.push(windowPos - sectionPos);
 		}
 
 		let index = -1;
 		let smallestDist = Number.MAX_VALUE;
 
 		for (let i = 0; i < distances.length; i++) {
-			if (distances[i] <= smallestDist) {
+			if (distances[i] <= smallestDist && distances[i] >= 0) {
 				index = i;
 				smallestDist = distances[i]
             }
