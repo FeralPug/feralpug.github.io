@@ -76,7 +76,7 @@
 
             <div class="PageImageContainer">
                 <img class="PageImage" src="Media/ExtendingSkyboxCapture.png" alt="Image of the final Result" />
-                <p class="PageImageText"> An example of what you can do with procedural skyboxes</p>
+                <p class="PageImageText"> An example of what you can do with procedural skyboxes and what our final shader will look like.</p>
             </div>
 
             <h2 class="Section" id="Part1">Part 1: Background on Skies</h2>
@@ -316,7 +316,7 @@
 </pre>
                 <p class="PageImageText">
                     Everything in between our <q>#define SCATTERING</q> and <q>#endif</q> has been stripped out of the Unity procedural skybox shader and added to our
-                    include file. Your include file should look just like this. We have just a few more things to rip out and one or two changes to the code.
+                    include file. Your include file should look just like this. We have just a few more things to rip out and one or two changes to make to the code.
                 </p>
             </div>
 
@@ -413,15 +413,19 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </div>
 
             <p class="PageText">
-                Now the last thing we have to recreate the Unity procedural skybox and get to extending it is to change the rendering mode, queue and preview, set Cull and Zwrite to off
+                Now the last thing we have to do to recreate the Unity procedural skybox and get to extending it is to change the rendering mode, queue and preview, set Cull and Zwrite to off,
                 add all the properties, include files, pragma statements, property variable declarations, vert and fragment data structures, and the vert and frag programs themselves.
             </p>
 
             <p class="PageText">
                 First, we change the rendering queue and type to <q>Background</q>. This is to tell the shader to render this last. In Unity when opaque objects are drawn to the render target of
-                the camera they draw into the stencil buffer. What this does is it tells Unity where stuff has been rendered or conversely where stuff has not been rendered. It
-                then knows that it should draw the skybox in only those parts of the screen. The preview tag just changes how its preview looks in the inspector. We do not want
-                cull any part of skybox, although I assume it would not make a difference, and we do not want to write to the Zbuffer, which could mess up post processing I suppose,
+                the camera they also draw into the stencil buffer. What this does is it tells Unity where stuff has been rendered, or conversely where stuff has not been rendered. It
+                then knows that it should draw the skybox in only those parts of the screen. The preview tag just changes how its preview looks in the inspector. 
+            </p>
+
+            <p class="PageText">
+                We do not want cull any part of skybox, although I assume it would not make a difference, and we do not want to write to the Zbuffer, 
+                which could mess up post processing I suppose,
                 if we were doing any. We also need to include our <q>Scattering.cginc</q> file as that is where all the functions now live and we also have to add the <q>_SunSize</q>
                 and <q>_SunSizeConvergence</q> to the parameters list for the <q>calcSunAttenuation</q> method call in the frag function.
             </p>
@@ -701,7 +705,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                 OK, now we are finished with setting up our shader. I know that was a lot so if you want you can just grab the completed version of this step from my
                 GitHub <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/tree/main/EndOfPart2%20Setup" title="A link to where you can download the finished files for this step" target="_blank">here</a>.
                 Just remember the include file has to go into a folder named <q>Includes</q> in the same directory as the shader
-                or you will have to change the file path on the include statement for our <q>Scattering.cginc</q>.
+                or you will have to change the file path on the include statement for our <q>Scattering.cginc</q> include file.
             </p>
 
             <h2 class="Section" id="Part3">Part 3: Adding Stars</h2>
@@ -723,18 +727,18 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </div>
 
             <p class="PageText">
-                To be able to use this texture we have to come up with a way to get UVs to sample the texture with in our shader. To do this we will get the
+                To be able to use this texture we have to come up with a way to get UVs to sample the texture within our shader. To do this we will get the
                 world space position of the current pixel we are working on, normalize it, and use that direction generate UV coordinates. I have seen lots of examples of turning
-                this direction into spherical coordinates using some triginometry, which we will do when we make our moon, but this makes for bad samples around the poles. A better way,
+                this direction into spherical coordinates using some trigonometry, which we will do when we make our moon, but this makes for bad samples around the poles. A better way,
                 and a lot simpler, is to just divide the and X and Z coordinates of our direction by the Y of our direction. This essentially projects our direction on to a plane
-                that sits directly on top of the sphere we are calling our skybox, and is orientated facing up. And we can take this one step further. By adding a number between
-                0 and 1 to the to Y coordinate before the division we can make this plane curve in a way that gives us control over how the stars are in the sky.
+                that sits directly on top of the sphere we are calling our skybox and is orientated facing up. And we can take this one step further. By adding a number between
+                0 and 1 to the Y coordinate before the division we can make this plane curve in a way that gives us control over how the stars are in the sky.
             </p>
             <p class="PageText">
-                To do that we will add a bending amount property along with a texture property and declare those variables. While we are at it we will clean up the
-                property block a bit. Next we will have to change our <q>v2f</q> struct a bit so we can pass the world position from the vertex shader to the fragment shader.
-                Then in the fragment shader we can get the direction, do the division, and finally sample the texture. For now we will just use a test texture to see it in action.
-                You can get that <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/blob/main/Textures/TestTexture.jpg" title="link to test texture" target="_blank">here</a>.
+                To do that we will add a bending amount property along with a texture property and declare those variables. While we are at it, we will clean up the
+                property block a bit. Next, we will have to change our <q>v2f</q> struct a bit so we can pass the world position from the vertex shader to the fragment shader.
+                Then in the fragment shader we can get the direction, do the division, and finally sample the texture. For now, we will just use a test texture to see it in action.
+                You can get that texture <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/blob/main/Textures/TestTexture.jpg" title="link to test texture" target="_blank">here</a>.
             </p>
 
             <div class="CodeHighlight">
@@ -860,8 +864,6 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </div>
 
 
-
-
             <div class="PageImageContainer">
                 <div class="ImageSideBySideContainer">
                     <img class="PageSideBySide" src="Media/StarBending0.png" alt="Picture of our projected texture" />
@@ -875,7 +877,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             <p class="PageText">
                 Now to get the actual stars we will switch to using our Voronoi texture and take the value at our texture sample, invert it with a <q>1 - value</q>
                 and then raise it to a power to get tight little dots in the sky. While we are at it let also add some new properties to control where the horizon
-                starts to mask out all of the features we are going to add because we dont want to be able to see them under the horizon anyway. To do that we take the
+                starts to mask out all of the features we are going to add because we do not want to be able to see them under the horizon anyway. To do that we take the
                 dot product of our world direction and an up vector, remap that value so that at our user set values it goes from 0 to 1 and then invert the value so 1 is
                 on top and zero is at the bottom. We can then use the 0 to 1 value to lerp between the background color and our added features. Once done play with the values
                 a bit to get what you like.
@@ -955,7 +957,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
             <div class="PageImageContainer">
                 <img class="PageImage" src="Media/Stars.png" alt="Our Stary sky" />
-                <p class="PageImageText"> A nice Stary sky</p>
+                <p class="PageImageText"> Stars!!!</p>
             </div>
 
             <p class="PageText">
@@ -1044,7 +1046,9 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
             <p class="PageText">
                 And with that our stars are done for the most part. All we will have to do in future steps is to make sure we mask them out accordingly with the other features
-                we will add. Next we will work on the procedural moon.
+                we will add. If you want you can grab the finished files for this step 
+                <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/tree/main/Part%20Three:%20Stars" title="Link to completed step" target="_blank">here</a>.
+                Next we will work on the procedural moon.
             </p>
 
             <h2 class="Section" id="Part4">Part 4: Adding a Moon</h2>
