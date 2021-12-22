@@ -2,35 +2,154 @@
     General Default Site wide styles
 */
 
+/* 
+    Fonts
+
+    Heading fonts first
+*/
+
+@font-face {
+    font-family: 'arvobold';
+    src: url('arvoKit/arvo-bold-webfont.woff2') format('woff2'), url('arvo-bold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'arvobold_italic';
+    src: url('arvoKit/arvo-bolditalic-webfont.woff2') format('woff2'), url('arvo-bolditalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'arvoitalic';
+    src: url('arvoKit/arvo-italic-webfont.woff2') format('woff2'), url('arvo-italic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'arvoregular';
+    src: url('arvoKit/arvo-regular-webfont.woff2') format('woff2'), url('arvo-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*
+    text fonts next
+*/
+
+@font-face {
+    font-family: 'open_sansbold';
+    src: url('openSansKit/opensans-bold-webfont.woff2') format('woff2'), url('opensans-bold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sansbold_italic';
+    src: url('openSansKit/opensans-bolditalic-webfont.woff2') format('woff2'), url('opensans-bolditalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sansextrabold';
+    src: url('openSansKit/opensans-extrabold-webfont.woff2') format('woff2'), url('opensans-extrabold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sansextrabold_italic';
+    src: url('openSansKit/opensans-extrabolditalic-webfont.woff2') format('woff2'), url('opensans-extrabolditalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sansitalic';
+    src: url('openSansKit/opensans-italic-webfont.woff2') format('woff2'), url('opensans-italic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sanslight';
+    src: url('openSansKit/opensans-light-webfont.woff2') format('woff2'), url('opensans-light-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sanslight_italic';
+    src: url('openSansKit/opensans-lightitalic-webfont.woff2') format('woff2'), url('opensans-lightitalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sansregular';
+    src: url('openSansKit/opensans-regular-webfont.woff2') format('woff2'), url('opensans-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sanssemibold';
+    src: url('openSansKit/opensans-semibold-webfont.woff2') format('woff2'), url('opensans-semibold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'open_sanssemibold_italic';
+    src: url('openSansKit/opensans-semibolditalic-webfont.woff2') format('woff2'), url('opensans-semibolditalic-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*
+    start of styles
+*/
+
 html {
     font-size: 10px;
     color: black;
     min-height: 100%;
     background-color: #FBFAF5;
+    font-family: "open_sansregular", sans-serif;
 }
 
 h1 {
     font-size: 3.2rem;
+    font-family: "arvoregular", sans-serif;
 }
 
 h2 {
     font-size: 2.4rem;
+    font-family: "arvoregular", sans-serif;
 }
 
 h3 {
     font-size: 1.8rem;
+    font-family: "arvoregular", sans-serif;
 }
 
 h4 {
     font-size: 1.6rem;
+    font-family: "arvoregular", sans-serif;
 }
 
 h5 {
     font-size: 1.3rem;
+    font-family: "arvoregular", sans-serif;
 }
 
 h6 {
     font-size: 1.07rem;
+    font-family: "arvoregular", sans-serif;
 }
 
 p{
