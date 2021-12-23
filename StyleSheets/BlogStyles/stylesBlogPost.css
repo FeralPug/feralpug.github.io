@@ -43,6 +43,10 @@ code {
     color: black;
 }
 
+.deletion{
+    text-decoration: line-through;
+}
+
 
 q {
     font-weight: bold;

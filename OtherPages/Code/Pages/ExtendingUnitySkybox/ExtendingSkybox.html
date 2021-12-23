@@ -1232,7 +1232,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                 <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/blob/main/Textures/MoonEquirect.jpg" title="Link to moon texture" target="_blank">here</a>.
             </p>
 
-<div class="CodeHighlight">
+            <div class="CodeHighlight">
 <pre>
 <code class="language-hlsl">    stars = pow(stars, _StarBrightness);
 
@@ -1242,12 +1242,201 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     return col;
 </code>
 </pre>
-</div>
+            </div>
             <div class="PageImageContainer">
-                    <img class="PageImage" src="Media/MoonAndStars.png" alt="Our moon masking out the stars" />
-                    <p class="PageImageText"> Now we have a textured moon that masks out the stars behind it</p>
+                <img class="PageImage" src="Media/MoonAndStars.png" alt="Our moon masking out the stars" />
+                <p class="PageImageText"> Now we have a textured moon that masks out the stars behind it</p>
             </div>
 
+            <p class="PageText">
+                Now that we have our moon the next thing, we will do is get it to orbit around the sky. The way I did this was to use the parametric equation of an ellipse.
+                An ellipse has a semi major and minor axis, major being the largest radius on the ellipse and the minor being the smallest radius on the ellipse. The center
+                of the ellipse is always the origin or <code>float3(0, 0, 0)</code> just to keep things simple.
+            </p>
+
+            <p class="PageText">
+                How we get a position from this is to take the cosine of the angle around the ellipse and multiply it by the semi major axis to get the X
+                coordinate, and take the sine of the same angle multiplied by the semi minor
+                axis to get the Z coordinate. We will only work in 2D for this part so the Y will get set to 0. Then we can normalize this vector to get a direction for
+                where our moon is. To get three dimensional orbits we then rotate our position on the ellipse using a rotation matrix that we pass <code>float3</code> with angles to rotate
+                around the three world axis.
+            </p>
+
+            <p class="PageText">
+                To do this we will add three functions, properties for the semi major and minor axis and a property for how fast the moon rotates. One of the functions will
+                just apply our rotation matrix, one of the functions will apply the ellipse equation to get our 2D position, and the last function will just call the first
+                two so that we do not have to write out three method calls in our shader. Add the following to your <code>MoonFunctions.cginc</code> file just after the include
+                guard.
+            </p>
+
+            <div class="CodeHighlight">
+<pre><code class="language-hlsl line-numbers">#ifndef MOON_INCLUDE
+    #define MOON_INCLUDE
+
+    //a rotation matrix to rotate and thing in world space
+    float3 RotateWorldPosition(float3 position, float3 axis)
+    {
+        float3 rot = axis;
+        float3x3 rotMat = float3x3(cos(rot.y) * cos(rot.z), -cos(rot.y) * sin(rot.z),
+            sin(rot.y), (cos(rot.x) * sin(rot.z)) + (sin(rot.x) * sin(rot.y) * cos(rot.z)),
+            (cos(rot.x) * cos(rot.z)) - (sin(rot.x) * sin(rot.y) * sin(rot.z)),
+            -sin(rot.x) * cos(rot.y), (sin(rot.x) * sin(rot.z)) - (cos(rot.x) * sin(rot.y) * cos(rot.z)),
+            (sin(rot.x) * cos(rot.z)) + (cos(rot.x) * sin(rot.y) * sin(rot.z)), cos(rot.x) * cos(rot.y));
+        float3 rotPos = mul(rotMat, position);
+        return rotPos;
+    }
+
+    //this is using the equation of an ellipse. The angle is time * speed, or what ever angle you want to sample at
+    float3 ElipsePosition(float2 MajMinAxis, float angle)
+    {
+        float3 orbitPos;
+        orbitPos.x = (MajMinAxis.x * cos(angle));
+        orbitPos.y = 0;
+        orbitPos.z = (MajMinAxis.y * sin(angle));
+        return normalize(orbitPos);
+    }
+
+    //this just calls the above function and rotates it by the desired amount
+    float3 GetOrbitPosition(float3 orbitOffsetAngles, float2 MajMinAxis, float angle)
+    {
+        float3 p = ElipsePosition(MajMinAxis, angle);
+        p = RotateWorldPosition(p, float3(radians(orbitOffsetAngles.x), radians(orbitOffsetAngles.y), radians(orbitOffsetAngles.z)));
+        return p;
+    }</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                Then also add the properties to our shader, declare them and call the functions in the frag function. For the angle we will just multiply <code>_Time.y</code>
+                by our orbit speed property. Make the following additions to the shader.
+            </p>
+
+            <div class="CodeHighlight">
+<pre><code class="language-hlsl">[Header(Moon)]
+    _MoonTex("Moon Tex", 2D) = "white" {}
+    _MoonRadius ("Moon Radius", Range(0, 1)) = .2
+                <span class="addition">_MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
+    _MoonOrbitSpeed("Moon Orbit Speed", Range(-1, 1)) = .05
+    _MoonSemiMajAxis("Moon Semi Major Axis", float) = 1
+    _MoonSemiMinAxis("Moon Semi Minor Axis", float) = 1</span>
+
+...
+
+    uniform sampler2D _MoonTex;
+    uniform float4 _MoonTex_ST;
+                <span class="addition">uniform float4 _MoonOrbitAngle;</span>
+    uniform float _MoonRadius;
+                <span class="addition">uniform float _MoonOrbitSpeed, _MoonSemiMajAxis, _MoonSemiMinAxis;</span>
+
+...
+
+//Moon
+                <span class="deletion"><span class="addition">float3 currentMoonPos = float3(1, 0, 0);</span></span>
+
+                <span class="addition">float orbitAngle = _Time.y * _MoonOrbitSpeed;
+            
+    //we also need to grab the half radius of the ellipse at the major and minor Axis
+    //these are used in the ellipse equation.
+    float2 MajMinAxis = float2(_MoonSemiMajAxis, _MoonSemiMinAxis);
+
+    //this equation takes these values along with the _MoonOrbitAngle to figure out the position in the moons orbit
+    float3 currentMoonPos = GetOrbitPosition(_MoonOrbitAngle, MajMinAxis, orbitAngle);</span>  
+
+    float radius = _MoonRadius;
+    float sphere = SphereIntersect(float3(0, 0, 0), normWorldPos, currentMoonPos, radius);
+
+</code>
+</pre>
+            </div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/OrbitMoon.gif" alt="Moon in orbit" />
+                <p class="PageImageText"> It&rsquo;s alive!!!</p>
+            </div>
+
+            <p class="PageText">
+                Play with the axis values as you like, they will change how fast the moon appears to fly by. But to really get the effect of eccentric orbits the moon
+                needs to change size as it gets further away. To do this we will change our <code>_MoonRadius</code> property to a <code>_MoonMaxSize</code> and
+                <code>_MoonMinSize</code>. Then we will calculate how close the moon is to the semi minor axis and use that value to <code>lerp</code> between these
+                two sizes. It isn&rsquo;t physically accurate but it works well and gives us more control over how the moon will look. First, we will add the
+                <code>lerp</code> function to our <code>MoonFunctions.cginc</code> file just after the <code>GetOrbitPosition</code> function.
+            </p>
+
+<div class="CodeHighlight">
+<pre><code class="language-hlsl">   float3 GetOrbitPosition(float3 orbitOffsetAngles, float2 MajMinAxis, float angle)
+    {
+        float3 p = ElipsePosition(MajMinAxis, angle);
+        p = RotateWorldPosition(p, float3(radians(orbitOffsetAngles.x), radians(orbitOffsetAngles.y), radians(orbitOffsetAngles.z)));
+        return p;
+    }
+
+    <span class="addition">//this lerps between two radius values based on how close the moon is to either the major or minor axis, major in this case is always (1, 0, 0)
+    float GetMoonDistance(float Min, float Max, float2 MajMinAxis, float angle)
+    {
+        float3 pos = ElipsePosition(MajMinAxis, angle);
+        float lerpFactor = abs(dot(pos, float3(0, 0, 1)));
+        float dist = lerp(Min, Max, smoothstep(0, 1, lerpFactor));
+        return dist;
+    }</span></code>
+</pre>
+</div>
+
+            <p class="PageText">
+                All this function is doing is calling the <code>EllipsePosition</code> function again with the same values as before but this time we do not rotate the position.
+                That way we can use the dot product of that position and forward, which by default is always the direction of the semi minor axis, and then use that value to 
+                lerp between the min and max sizes. I use a <code>smoothstep</code> function here to just make the change a little bit smoother.
+            </p>
+
+            <p class="PageText">
+                Now we can call this function in our shader to get the radius for our moon at any point during its orbit. We just have to add a few new properties, declare them
+                and then call the new function and assign its return value to our radius variable. Make the following changes.
+            </p>
+
+<div class="CodeHighlight">
+<pre><code class="language-hlsl">   [Header(Moon)]
+    _MoonTex("Moon Tex", 2D) = "white" {}
+    <span class="deletion"><span class="addition">_MoonRadius ("Moon Radius", Range(0, 1)) = .2</span></span>
+    <span class="addition">_MoonMaxSize ("Moon Max Size", Range(0, 1)) = .2
+    _MoonMinSize ("Moon Min Size", Range(0, 1)) = .2</span>
+    _MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
+    _MoonOrbitSpeed("Moon Orbit Speed", Range(-1, 1)) = .05
+    _MoonSemiMajAxis("Moon Semi Major Axis", float) = 1
+    _MoonSemiMinAxis("Moon Semi Minor Axis", float) = 1
+
+...
+
+    uniform sampler2D _MoonTex;
+    uniform float4 _MoonTex_ST;
+    uniform float4 _MoonOrbitAngle;
+    <span class="deletion"><span class="addition">uniform float _MoonRadius;</span></span>
+    <span class="addition">uniform float _MoonMaxSize, _MoonMinSize;</span>
+    uniform float _MoonOrbitSpeed, _MoonSemiMajAxis, _MoonSemiMinAxis;
+
+...
+
+    float3 currentMoonPos = GetOrbitPosition(_MoonOrbitAngle, MajMinAxis, orbitAngle);    
+
+    <span class="deletion"><span class=" addition">float radius = _MoonRadius;</span></span>
+    <span class=" addition">float radius = GetMoonDistance(_MoonMinSize, _MoonMaxSize, MajMinAxis, orbitAngle);</span>
+    float sphere = SphereIntersect(float3(0, 0, 0), normWorldPos, currentMoonPos, radius);</code>
+</pre>
+</div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/BigMoon.gif" alt="Moon getting bigger" />
+                <p class="PageImageText"> Bigger than before!</p>
+            </div>
+
+            <p class="PageText">
+                Now the only problem with this method is that currently the moon will always be smallest at its starting position and largest 90 degrees away from that
+                position. That is kind of annoying. So what we can do is we can rotate our moon around its orbit before calculating the radius, and then not tell the 
+                <code>GetMoonDistance</code> function about that. This will offset where the moon gets bigger and smaller, giving us full control over its orbit.
+            </p>
+
+            <p class="PageText">
+                To get this working takes a little bit of doing. We need to rotate the moon around the axis that is equal to the normal of the plane that the ellipse lies in.
+
+            </p>
 
             <!-- these are here just so I can grab the right formatting as we write
 
