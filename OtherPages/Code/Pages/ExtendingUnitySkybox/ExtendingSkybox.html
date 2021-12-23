@@ -1435,7 +1435,110 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
             <p class="PageText">
                 To get this working takes a little bit of doing. We need to rotate the moon around the axis that is equal to the normal of the plane that the ellipse lies in.
+                To calculate this we can find the position of the moon at a different angle from it&rsquo;s current position and take the cross product of those two vectors. Then
+                once we have that up vector, we can use another rotation matrix to rotate however much we want to offset the position by. We cannot use the same rotation matrix
+                that we used before, because that rotates in world space, but we can use a matrix that rotates around an arbitrary axis. You can read more about how to calculate
+                this matrix <a href="https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle" title="Link to Wiki page" target="_blank">here</a>.
+            </p>
 
+            <p class="PageText">
+                So once again we will add one more function to our <code>MoonFunctions.cginc</code> inlude file. This function will rotate a point around an arbitrary axis
+                as was just described. Then we will add a property to our shader to allow control over how much the moon is rotated, and declare that property. To get the up we
+                will just call the <code>GetOrbitPosition</code> method but pass in <code>orbitAngle - 1</code> instead of just <code>orbitAngle</code> and take the cross product
+                of those two results. Then we can pass the up vector along with the amount to rotate, and we will have complete control over our moon&rsquo;s orbit. Make the 
+                following changes.
+            </p>
+
+<div class="CodeHighlight">
+<pre><code class="language-hlsl">#ifndef MOON_INCLUDE
+    #define MOON_INCLUDE    
+
+...
+    
+    //sphere tracing from https://www.iquilezles.org/www/articles/intersectors/intersectors.htm
+    float SphereIntersect(float3 rayOrigin, float3 rayDirection, float3 spherePos, float sphereRadius)
+    {
+        float3 originToCenter = rayOrigin - spherePos;
+        float b = dot(originToCenter, rayDirection);
+        float c = dot(originToCenter, originToCenter) - sphereRadius * sphereRadius;
+        float h = b * b - c;
+        if (h < 0.0)
+        {
+            return -1.0;
+        }
+        h = sqrt(h);
+        return -b - h;
+    }
+
+    <span class="addition">// How to rotate around any axis https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+    float3 RotateArbitraryAxis(float3 vec, float angle, float3 axis)
+    {
+        float rads = radians(angle);
+        float3x3 rot = float3x3(float3(cos(rads) + dot(axis.x, axis.x) * (1 - cos(rads)), axis.x * axis.y * (1 - cos(rads)) - axis.z * sin(rads), axis.x * axis.z * (1 - cos(rads)) + axis.y * sin(rads)),
+            float3(axis.y * axis.x * (1 - cos(rads)) + axis.z * sin(rads), cos(rads) + dot(axis.y, axis.y) * (1 - cos(rads)), axis.y * axis.z * (1 - cos(rads)) - axis.x * sin(rads)),
+            float3(axis.z * axis.x * (1 - cos(rads)) - axis.y * sin(rads), axis.z * axis.y * (1 - cos(rads)) + axis.x * sin(rads), cos(rads) + dot(axis.z, axis.z) * (1 - cos(rads))));
+
+        return mul(rot, vec);
+    }</span>
+
+#endif
+    </code>
+</pre>
+
+    <p class="PageImageText">Adding the arbitrary rotation matrix to our <code>MoonFunctions.cginc</code> file</p>
+</div>
+
+
+
+<div class="CodeHighlight">
+<pre><code class="language-hlsl">   [Header(Moon)]
+    _MoonTex("Moon Tex", 2D) = "white" {} 
+    _MoonMaxSize ("Moon Max Size", Range(0, 1)) = .2
+    _MoonMinSize ("Moon Min Size", Range(0, 1)) = .2 
+    _MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
+    <span class="addition">_MoonOrbitOffset("Moon Orbit Offset", Range(0, 90)) = 0</span>
+    _MoonOrbitSpeed("Moon Orbit Speed", Range(-1, 1)) = .05
+    _MoonSemiMajAxis("Moon Semi Major Axis", float) = 1
+    _MoonSemiMinAxis("Moon Semi Minor Axis", float) = 1
+    
+...
+
+    uniform sampler2D _MoonTex;
+    uniform float4 _MoonTex_ST;
+    uniform float4 _MoonOrbitAngle;
+    uniform float _MoonMaxSize, _MoonMinSize;
+    uniform float _MoonOrbitSpeed, <span class="addition">_MoonOrbitOffset,</span> _MoonSemiMajAxis, _MoonSemiMinAxis;
+
+...
+
+    //this equation takes these values along with the _MoonOrbitAngle to figure out the position in the moons orbit
+    float3 currentMoonPos = GetOrbitPosition(_MoonOrbitAngle, MajMinAxis, orbitAngle);    
+
+    <span class="addition">//we need to know which direction is up from the orbit plane, We do this by getting a different position and crossing the two positions
+    float3 prevMoonPos = GetOrbitPosition(_MoonOrbitAngle, MajMinAxis, orbitAngle - 1);  
+    float3 moonUp = normalize(cross(currentMoonPos, prevMoonPos)); 
+
+    //Then we can offset the position around the orbit. This allows us to change where in the orbit the planet should be largest or smallest         
+    currentMoonPos = RotateArbitraryAxis(currentMoonPos, _MoonOrbitOffset, moonUp);</span>
+
+    //float radius = _MoonRadius;
+    float radius = GetMoonDistance(_MoonMinSize, _MoonMaxSize, MajMinAxis, orbitAngle);
+    float sphere = SphereIntersect(float3(0, 0, 0), normWorldPos, currentMoonPos, radius);
+    </code>
+</pre>
+
+    <p class="PageImageText">Changes made to the shader</p>
+</div>
+
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/BigMoonInSky.gif" alt="Gif of the moon getting bigger in the sky" />
+                    <p class="PageImageText"> Now our moon can get closer while high in the sky. I have set the semi major axis to 4, the minor to 1,
+                <code>_MoonOrbitAngle</code> to <code>float3(0, 0, 45)</code> and the <code>_MoonOrbitOffset</code> to 90.</p>
+            </div>
+
+            <p class="PageText">
+                Great, that gives us complete control over our moon&rsquo;s orbit. Now all we have left to do with our moon is to get it spinning. As mentioned before we
+                will have a few modes the shader can be in: Spinning and Tidal Locked.
             </p>
 
             <!-- these are here just so I can grab the right formatting as we write
@@ -1460,11 +1563,11 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                 <p class="PageText">
                 </p>
 
-                <div class="CodeHighlight">
-    <pre>
-    <code class="language-hlsl"></code>
-    </pre>
-                </div>
+<div class="CodeHighlight">
+<pre>
+<code class="language-hlsl"></code>
+</pre>
+</div>
         -->
         </article>
 
