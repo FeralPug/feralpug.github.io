@@ -961,6 +961,70 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </div>
 
             <p class="PageText">
+                Now to give our stars a little more life, we will make them twinkle. To do this we will sample a noise texture using the same uvs we used to sample the
+                voronoi texture. Then, multiply it by a user controlled value, and finally subtract that from our <code>stars</code> value. We will also <code>saturate</code>
+                the <code>stars</code> value before doing the <code>lerp</code> to clamp everything between 0 and 1. You can get the texture I used
+                <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/blob/main/Textures/starsHighlight.png" title="Link to noise texture" target="_blank">here</a>.
+                Add the following code to your shader.
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/starsHighlight.png" alt="Noise texture" />
+                <p class="PageImageText"> Noise texture used to create a twinkle effect on the stars</p>
+            </div>
+
+<div class="CodeHighlight">
+<pre>
+<code class="language-hlsl">    _SkyFadeStart("Sky Fade Start", Range(-1, 1)) = .05
+    _SkyFadeEnd("Sky End Start", Range(-1, 1)) = -.05
+
+    [Header (Stars)]
+    _StarTex("Star Tex", 2D) = "black" {}
+    _StarBending("Star Bending", Range(0, 1)) = 1
+    _StarBrightness("Star Brightness", Range(0, 100)) = 8.5
+    <span class="addition">_TwinkleTex ("Twinkle Noise Tex", 2D) = "black" {}
+    _TwinkleBoost("Twinkle Boost", Range(0, 1)) = .25
+    _TwinkleSpeed("Twinkle Speed", Range(0, 1)) = .1</span>
+
+...
+
+    uniform half _SkyFadeStart, _SkyFadeEnd;
+
+    uniform sampler2D _StarTex, <span class="addition">_TwinkleTex;</span>
+    uniform float4 _StarTex_ST, <span class="addition">_TwinkleTex_ST;</span>
+    uniform float _StarBending, _StarBrightness;
+    <span class="addition">uniform float _TwinkleBoost, _TwinkleSpeed;</span>
+
+...
+
+    float2 starsUV = normWorldPos.xz / (normWorldPos.y + _StarBending);
+    float stars = tex2D(_StarTex, starsUV * _StarTex_ST.xy + _StarTex_ST.zw).r;
+    //invert the voronoi
+    stars = 1 - stars;
+    //and then raise the value to a power to adjust the brightness falloff of the stars
+    stars = pow(stars, _StarBrightness);
+
+    <span class="addition">//we also sample a basic noise texture, this allows us to modulate the star brightness, this creates a twinkle effect
+    float twinkle = tex2D(_TwinkleTex, (starsUV * _TwinkleTex_ST.xy) + _TwinkleTex_ST.zw + float2(1, 0) * _Time.y * _TwinkleSpeed).r;
+    //modulate the twinkle value
+    twinkle *= _TwinkleBoost;
+                
+    //then adjust the final color
+    stars -= twinkle;
+    stars = saturate(stars);</span>
+
+    //then lerp to the stars color masking out the horizon
+    col.rgb = lerp(col.rgb, col.rgb + stars, horizonValue);
+</code>
+</pre>
+</div>
+
+                                <div class="PageImageContainer">
+                        <img class="PageImage" src="Media/StarTwinkle.gif" alt="Gif of stars twinkling" />
+                        <p class="PageImageText"> Twinkle twinkle procedural star</p>
+                    </div>
+
+            <p class="PageText">
                 Once last addition we will make is a way to transition our added features from day to night, as somethings like stars should really only by visible
                 during the night. To do that we will again add a few more properties, declare their variables, and then do almost exactly what we did for our horizon value
                 except we will use the position of the sun instead of our world direction. Since we will use the sun position in a few places we will store it in a nicely named
@@ -1537,13 +1601,249 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </div>
 
             <p class="PageText">
-                Great, that gives us complete control over our moon&rsquo;s orbit. Now all we have left to do with our moon is to get it spinning. As mentioned before we
-                will have a few modes the shader can be in: Spinning and Tidal Locked.
+                Great, that gives us complete control over our moon&rsquo;s orbit. Now the last features we will add to our moon is phases and spinning. For phases we will have 
+                two modes: user-controller or light-controlled. For our spin we will have three modes: tidal-locked, local-rotation, and the default, which is world rotation.
+                We will start with the spin as that is a little more complicated.
             </p>
+
+            <p class="PageText">
+                To spin our moon, we will declare a vector property that will be the angle per second we want our moon to rotate. We will pass that into our <code>RotateWorldPosition</code>
+                function defined in our <code>MoonFunctions.cginc</code> along with the normal, after converting the angle to radians, as that is what the function expects.
+                This will rotate the normal around the moon origin, and since we use the normal to calculate uvs, that will spin the moon. That is pretty much all we need to
+                do to rotate the moon. However, for our different modes we will define the local, or object space, coordinates of our moon and create a matrix that converts from world space
+                to local space using that local definition. The axis of our local space will be z = towards the camera, x = opposite the direction of orbit, and y = the <code>moonUp</code>
+                variable that we already calculated.
+            </p>
+
+            <p class="PageText">
+                Then with this matrix we can convert the normal to local space and rotate the normal if we are spinning locally, or just use the local normal if in tidal-lock 
+                mode. This works because in local space the normals that are visible to the player are always the same. However, to make any part of the moon texture visible,
+                we will rotate the local normal by the same amount so that the user can control which part of the moon faces the player. To do this we will declare a few
+                properties that control the spin of the moon and what mode the shader is in. We will use the enum property attribute to control keywords that are defined for our
+                shader. You can read more about that <a href="https://docs.unity3d.com/ScriptReference/MaterialPropertyDrawer.html" title="Link to Unity docs page" target="_blank">here</a>.
+                Add the following code to your shader.
+            </p>
+
+<div class="CodeHighlight">
+<pre>
+<code class="language-hlsl">
+    [Header(Moon)]
+    _MoonTex("Moon Tex", 2D) = "white" {} 
+    _MoonMaxSize ("Moon Max Size", Range(0, 1)) = .2
+    _MoonMinSize ("Moon Min Size", Range(0, 1)) = .2 
+    _MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
+    _MoonOrbitOffset("Moon Orbit Offset", Range(0, 90)) = 0
+    _MoonOrbitSpeed("Moon Orbit Speed", Range(-1, 1)) = .05
+    _MoonSemiMajAxis("Moon Semi Major Axis", float) = 1
+    _MoonSemiMinAxis("Moon Semi Minor Axis", float) = 1
+    <span class="addition">[KeywordEnum(TIDAL_LOCK, LOCAL_ROTATE, WORLD_ROTATE)] _MoonSpinOption ("Moon Spin Option", float) = 1
+    _MoonTidalAngle("Moon Tidal Lock Angle (XYZ)", vector) = (0, 0, 0, 0)
+    _MoonSpinSpeed("Moon Spin Speed (XYZ)", vector) = (0, 0, 0, 0)</span>
+
+...
+
+    uniform sampler2D _MoonTex;
+    uniform float4 _MoonTex_ST;
+    uniform float4 _MoonOrbitAngle;
+    uniform float _MoonMaxSize, _MoonMinSize;
+    uniform float _MoonOrbitSpeed, _MoonOrbitOffset, _MoonSemiMajAxis, _MoonSemiMinAxis;
+    <span class="addition">uniform float3 _MoonSpinSpeed, _MoonTidalAngle;</span>
+
+...
+
+    //get the position on the sphere and use that to get the normal for the sphere
+    float3 moonFragPos = normWorldPos * sphere + float3(0, 0, 0);
+    //the normal is how we eventually get uvs and lighting
+    float3 moonFragNormal = normalize(moonFragPos - currentMoonPos);
+
+    <span class="addition">//get the local forward and tangent vector for the sphere based on the up
+    float3 moonForward = normalize(-currentMoonPos);
+    float3 moonTangent = cross(moonForward, moonUp);
+
+    //construct a world to object matrix
+    float3x3 worldToObject = float3x3(moonTangent, moonUp, moonForward);   
+
+//if we want tidal locking, i.e. the same face always looks at the viewer
+#ifdef _MOONSPINOPTION_TIDAL_LOCK     
+                moonFragNormal = mul(worldToObject, moonFragNormal);
+                //rotate the normal to change which side of the moon points towards the viewer
+                moonFragNormal = RotateWorldPosition(moonFragNormal, float3(radians(_MoonTidalAngle.x), radians(_MoonTidalAngle.y), radians(_MoonTidalAngle.z)));
+//if not tidal locked then we can have the planet spin
+#else
+    //we can do this in local coords
+    #ifdef _MOONSPINOPTION_LOCAL_ROTATE
+                moonFragNormal = mul(worldToObject, moonFragNormal);
+                float3 spinAngle = _Time.y * _MoonSpinSpeed.xyz;
+                moonFragNormal = RotateWorldPosition(moonFragNormal, float3(radians(spinAngle.x), radians(spinAngle.y), radians(spinAngle.z)));
+                moonFragNormal = mul(moonFragNormal, worldToObject);
+    //or in world coords
+    #else
+                float3 spinAngle = _Time.y * _MoonSpinSpeed.xyz;
+                moonFragNormal = RotateWorldPosition(moonFragNormal, float3(radians(spinAngle.x), radians(spinAngle.y), radians(spinAngle.z)));
+    #endif
+#endif</span>
+
+    //get uv from the normal
+    float u = atan2(moonFragNormal.z, moonFragNormal.x) / UNITY_TWO_PI;
+    //to get around this we take the frac of this u value because these values are the same at the boundary but the frac value doesnt have the seam
+    float fracU = frac(u);
+                
+    //so then we just pick which of the u values we want, the -0.001 just makes it favor the original one
+    //to get the y we use acos which returns the same as atan. using acos is better than asin because asin causes warping at the poles
+    float2 moonUV = float2(
+                    fwidth(u) < fwidth(fracU) - 0.001 ? u : fracU,
+                    acos(-moonFragNormal.y) / UNITY_PI
+    );   
+</code>
+</pre>
+</div>
+
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/RotateWorld.gif" alt="Gif of the moon spinning" />
+                    <p class="PageImageText"> Our moon spinning in world space</p>
+            </div>
+
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/TidalLock.gif" alt="Gif of the moon tidal locked" />
+                    <p class="PageImageText"> Our moon tidal locked always showing the same face</p>
+            </div>
+
+            <p class="PageText">
+                Lastly, we will add phases to our moon to finish off this part of the shader. To have the phases be based off of the sun direction all we have to do is take the
+                dot product of the moon normal and the light direction, to simulate basic Lambert lighting. To have user control over the moon phase is a little bit more
+                complicated. To do this we will convert our normal to local space, and take the dot product with <code>float3(0, 0, 1)</code>, or forward, which is always
+                towards the player in local space. We can then rotate this forward with a vector property that we declare to change its direction. Then finally we can take the
+                dot product of this vector and the normal in local space to simulate Lambert lighting. Then with this dot product we will <code>lerp</code> between the 
+                moon and the sky color. We will make a few changes to what we just did because we do not need to
+                convert to local space multiple times. We will also add a property to control the color of the moon while we are finishing up. Add the following.
+            </p>
+
+<div class="CodeHighlight">
+<pre>
+<code class="language-hlsl">
+        [Header(Moon)]
+        <span class="addition">_MoonColor("Moon Color", Color) = (1, 1, 1, 1)</span>
+        _MoonTex("Moon Tex", 2D) = "white" {} 
+        _MoonMaxSize ("Moon Max Size", Range(0, 1)) = .2
+        _MoonMinSize ("Moon Min Size", Range(0, 1)) = .2 
+        _MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
+        _MoonOrbitOffset("Moon Orbit Offset", Range(0, 90)) = 0
+        _MoonOrbitSpeed("Moon Orbit Speed", Range(-1, 1)) = .05
+        _MoonSemiMajAxis("Moon Semi Major Axis", float) = 1
+        _MoonSemiMinAxis("Moon Semi Minor Axis", float) = 1
+        <span class="addition">[Toggle(PHASE_LIGHT)] _MoonPhaseOption ("Auto Phase", float) = 1
+        _MoonPhase("Moon Phase", vector) = (50, 0, 0, 0)</span>
+        [KeywordEnum(TIDAL_LOCK, LOCAL_ROTATE, WORLD_ROTATE)] _MoonSpinOption ("Moon Spin Option", float) = 1
+        _MoonTidalAngle("Moon Tidal Lock Angle (XYZ)", vector) = (0, 0, 0, 0)
+        _MoonSpinSpeed("Moon Spin Speed (XYZ)", vector) = (0, 0, 0, 0)
+
+...
+
+    #pragma multi_compile _MOONSPINOPTION_TIDAL_LOCK _MOONSPINOPTION_LOCAL_ROTATE _MOONSPINOPTION_WORLD_ROTATE
+    <code class="addition">multi_compile _ PHASE_LIGHT</code>
+    #pragma multi_compile_local _SUNDISK_NONE _SUNDISK_SIMPLE _SUNDISK_HIGH_QUALITY
+
+...
+
+    uniform sampler2D _MoonTex;
+    uniform float4 _MoonTex_ST;
+    <span class="addition">uniform float4 _MoonColor;</span>
+    uniform float4 _MoonOrbitAngle;
+    uniform float _MoonMaxSize, _MoonMinSize;
+    uniform float _MoonOrbitSpeed, _MoonOrbitOffset, _MoonSemiMajAxis, _MoonSemiMinAxis;
+    uniform float3 _MoonSpinSpeed, _MoonTidalAngle;
+    <span class="addition">uniform float3 _MoonPhase;</span>
+
+    //construct a world to object matrix
+    float3x3 worldToObject = float3x3(moonTangent, moonUp, moonForward);   
+
+    <span class="addition">//transform the normal into local space and use that to calculate lighting
+    //it looks wrong to have the lighting change as it goes across the sky, that why we keep it static
+    float3 phaseNormal = mul(worldToObject, moonFragNormal);
+
+#ifndef PHASE_LIGHT
+    //rotate the normal by the desired amount to change the phase of the moon
+    float3 moonPhase = RotateWorldPosition(float3(0, 0, 1), float3(radians(_MoonPhase.x), radians(_MoonPhase.y), radians(_MoonPhase.z)));
+
+    //basic lambert lighting
+    float NDotL = dot(moonPhase, phaseNormal);
+
+#else
+    //basic lambert lighting
+    float NDotL = dot(sunPos, moonFragNormal);
+
+#endif</span>
+
+//if we want tidal locking, i.e. the same face always looks at the viewer
+#ifdef _MOONSPINOPTION_TIDAL_LOCK         
+    //we use the local definiton of the normal
+    <span class="deletion"><span class="addition">moonFragNormal = mul(worldToObject, moonFragNormal);</span></span>
+    <span class="addition">moonFragNormal = phaseNormal;</span>
+    //and rotate the normal to change which side of the moon points towards the viewer
+    moonFragNormal = RotateWorldPosition(moonFragNormal, float3(radians(_MoonTidalAngle.x), radians(_MoonTidalAngle.y), radians(_MoonTidalAngle.z)));
+//if not tidal locked then we can have the planet spin
+#else
+    //we can do this in local coords
+    #ifdef _MOONSPINOPTION_LOCAL_ROTATE
+        //we use the local definiton of the normal
+        <span class="deletion"><span class="addition">moonFragNormal = mul(worldToObject, moonFragNormal);</span></span>
+        <span class="addition">moonFragNormal = phaseNormal;</span>
+        float3 spinAngle = _Time.y * _MoonSpinSpeed.xyz;
+        moonFragNormal = RotateWorldPosition(moonFragNormal, float3(radians(spinAngle.x), radians(spinAngle.y), radians(spinAngle.z)));
+        moonFragNormal = mul(moonFragNormal, worldToObject);
+    //or in world coords
+    #else
+        float3 spinAngle = _Time.y * _MoonSpinSpeed.xyz;
+        moonFragNormal = RotateWorldPosition(moonFragNormal, float3(radians(spinAngle.x), radians(spinAngle.y), radians(spinAngle.z)));
+    #endif
+#endif
+
+    //get uv from the normal
+    float u = atan2(moonFragNormal.z, moonFragNormal.x) / UNITY_TWO_PI;
+    //to get around this we take the frac of this u value because these values are the same at the boundary but the frac value doesnt have the seam
+    float fracU = frac(u);
+                
+    //so then we just pick which of the u values we want, the -0.001 just makes it favor the original one
+    //to get the y we use acos which returns the same as atan. using acos is better than asin because asin causes warping at the poles
+    float2 moonUV = float2(
+                    fwidth(u) < fwidth(fracU) - 0.001 ? u : fracU,
+                    acos(-moonFragNormal.y) / UNITY_PI
+    );   
+
+    //if our sphere tracing returned a positive value we have a moon fragment
+    if(sphere >= 0.0){
+        //so we grab the moon tex and multiple the color
+        float3 moonTex = tex2D(_MoonTex, moonUV).rgb <span class="addition">* _MoonColor.rgb;
+
+        //then we lerp to the color be how much of the moon is lit
+        moonTex = lerp(col.rgb, moonTex * NDotL, saturate(NDotL));</span>
+
+        //then lerp to the final color masking out anything uner the horizon and anywhere there is clouds as they should be infron of the moon
+        col.rgb = lerp(col.rgb, moonTex, horizonValue);
+    }
+</code>
+</pre>
+</div>
+
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/MoonPhase.png" alt="Our moon with phases" />
+                    <p class="PageImageText"> Now we have phases of our moon</p>
+                </div>
+
+            <p class="PageText">
+                And with that we have completed the moon part of our shader. Our moon can orbit, rotate, and have different phases, and it is all user controlled. You can
+                get the shader finished up to this point 
+                <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/tree/main/Part%204:%20Moon" title="Link to finished section" target="_blank">here</a> and
+                you can find the textures used <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/tree/main/Textures" title="Link to finished section" target="_blank">here</a>.
+                Next we will wrap up by adding some clouds to our sky box.
+            </p>
+
+            <h2 class="Section" id="Part5">Part 5: Clouds</h2>
+
 
             <!-- these are here just so I can grab the right formatting as we write
 
-                <h2 id="Part1">Part 1: Background on Skies</h2>
+                <h2 class="Section" id="Part5">Part 5: Clouds</h2>
 
                 <div class="PageImageContainer">
                     <img class="PageImage" src="Media/ExtendingSkyboxCapture.png" alt="Image of the final Result" />
@@ -1582,22 +1882,27 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                     </li>
                     <li>
                         <a href="#Part1" title="Jump to part one">
-                            Part 1
+                            Part 1: Background
                         </a>
                     </li>
                     <li>
                         <a href="#Part2" title="Jump to part two">
-                            Part 2
+                            Part 2: Setup
                         </a>
                     </li>
                     <li>
                         <a href="#Part3" title="Jump to part three">
-                            Part 3
+                            Part 3: Stars
                         </a>
                     </li>
                     <li>
                         <a href="#Part4" title="Jump to part four">
-                            Part 4
+                            Part 4: Moon
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part5" title="Jump to part five">
+                            Part 5: Clouds
                         </a>
                     </li>
                 </ul>
