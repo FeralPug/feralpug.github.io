@@ -441,7 +441,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 {
     Properties
     {
-                <span class="addition">[KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
+        <span class="addition">[KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
         _SunSize ("Sun Size", Range(0,1)) = 0.04
         _SunSizeConvergence("Sun Size Convergence", Range(1,10)) = 5
 
@@ -454,7 +454,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     }
     SubShader
     {
-                <span class="addition">Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
+        <span class="addition">Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
         Cull Off ZWrite Off</span>
     
         Pass
@@ -464,7 +464,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             #pragma fragment frag
 
             #include &quot;UnityCG.cginc&quot;
-                <span class="addition">#include &quot;Lighting.cginc&quot;
+            <span class="addition">#include &quot;Lighting.cginc&quot;
             #include &quot;Includes/Scattering.cginc&quot;
 
             #pragma multi_compile_local _SUNDISK_NONE _SUNDISK_SIMPLE _SUNDISK_HIGH_QUALITY
@@ -745,7 +745,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 <pre>
 <code class="language-hlsl">Properties
     {
-                <span class="addition">[Header(SkyAndSun)]</span>
+        <span class="addition">[Header(SkyAndSun)]</span>
         [KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
         _SunSize ("Sun Size", Range(0,1)) = 0.04
         _SunSizeConvergence("Sun Size Convergence", Range(1,10)) = 5
@@ -754,7 +754,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
         _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
         _Exposure("Exposure", Range(0, 8)) = 1.3
 
-                <span class="addition">[Header (Stars)]
+        <span class="addition">[Header (Stars)]
         _StarTex("Star Tex", 2D) = "black" {}
         _StarBending("Star Bending", Range(0, 1)) = 1</span>
     }
@@ -768,7 +768,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     uniform half3 _SkyTint;
     uniform half _AtmosphereThickness;
 
-                <span class="addition">uniform sampler2D _StarTex;
+    <span class="addition">uniform sampler2D _StarTex;
     uniform float4 _StarTex_ST;
     uniform float _StarBending;</span>
 
@@ -781,7 +781,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     struct v2f
     {
         float4  pos             : SV_POSITION;
-                <span class="addition">float3 worldPos : TEXCOORD0;</span>
+            <span class="addition">float3 worldPos : TEXCOORD0;</span>
         #if SKYBOX_SUNDISK == SKYBOX_SUNDISK_HQ
         // for HQ sun disk, we need vertex itself to calculate ray-dir per-pixel
             float3  vertex          : TEXCOORD<span class="addition">1</span>;
@@ -809,7 +809,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
         OUT.pos = UnityObjectToClipPos(v.vertex);
-                <span class="addition">OUT.worldPos = mul(unity_ObjectToWorld, v.vertex);</span>
+        <span class="addition">OUT.worldPos = mul(unity_ObjectToWorld, v.vertex);</span>
 
         float3 kSkyTintInGammaSpace = COLOR_2_GAMMA(_SkyTint); // convert tint from Linear back to Gamma
         float3 kScatteringWavelength = lerp (
@@ -818,13 +818,13 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
     fixed4 frag (v2f IN) : SV_Target
     {
-                <span class="addition">//first off we declare some values and set up some stuff that will get used a lot in the shader
+        <span class="addition">//first off we declare some values and set up some stuff that will get used a lot in the shader
         float4 col = float4(0, 0, 0, 0);
 
         //first off we have to make our positions fit a sphere
         float3 normWorldPos = normalize(IN.worldPos);
 
-//Start of Unity code</span>
+    //Start of Unity code</span>
         // if y > 1 [eyeRay.y < -SKY_GROUND_THRESHOLD] - ground
         // if y >= 0 and < 1 [eyeRay.y <= 0 and > -SKY_GROUND_THRESHOLD] - horizon
         // if y < 0 [eyeRay.y > 0] - sky
@@ -849,10 +849,10 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
         #endif
 
         #if defined(UNITY_COLORSPACE_GAMMA) && !SKYBOX_COLOR_IN_TARGET_COLOR_SPACE
-                <span class="addition">col.rgb</span> = LINEAR_2_OUTPUT(col);
+            <span class="addition">col.rgb</span> = LINEAR_2_OUTPUT(col);
         #endif
 
-                <span class="addition">//End of Unity Code
+    <span class="addition">//End of Unity Code
 
     //Stars
         float2 starsUV = normWorldPos.xz / (normWorldPos.y + _StarBending);
@@ -895,13 +895,13 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     _SkyTint ("Sky Tint", Color) = (.5, .5, .5, 1)
     _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
     _Exposure("Exposure", Range(0, 8)) = 1.3
-                <span class="addition">_SkyFadeStart("Sky Fade Start", Range(-1, 1)) = .05
+    <span class="addition">_SkyFadeStart("Sky Fade Start", Range(-1, 1)) = .05
     _SkyFadeEnd("Sky End Start", Range(-1, 1)) = -.05</span>
 
     [Header (Stars)]
     _StarTex("Star Tex", 2D) = "black" {}
     _StarBending("Star Bending", Range(0, 1)) = 1
-                <span class="addition">_StarBrightness("Star Brightness", Range(0, 100)) = 8.5</span>
+    <span class="addition">_StarBrightness("Star Brightness", Range(0, 100)) = 8.5</span>
 }
 
 ...
@@ -912,7 +912,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     uniform half _SunSizeConvergence;
     uniform half3 _SkyTint;
     uniform half _AtmosphereThickness;
-                <span class="addition">uniform half _SkyFadeStart, _SkyFadeEnd;</span>
+    <span class="addition">uniform half _SkyFadeStart, _SkyFadeEnd;</span>
 
     uniform sampler2D _StarTex;
     uniform float4 _StarTex_ST;
@@ -920,7 +920,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
 ...
 
-                <span class="addition">float Remap(float In, float2 InMinMax, float2 OutMinMax)
+    <span class="addition">float Remap(float In, float2 InMinMax, float2 OutMinMax)
     {
         return OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
     }</span>
@@ -933,7 +933,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
         //first off we have to make our positions fit a sphere
         float3 normWorldPos = normalize(IN.worldPos);
 
-                <span class="addition">//this sets up where things will start to fade out along the horizon. The values allow us to give it some range so it fades out
+        <span class="addition">//this sets up where things will start to fade out along the horizon. The values allow us to give it some range so it fades out
         //we have to do 1 minus because the start fade value is actauly higher then the end. You could do the dot with down but I like this better
         float horizonValue = dot(normWorldPos, float3(0, 1, 0));
         horizonValue = 1 - saturate(Remap(horizonValue, float2(_SkyFadeStart, _SkyFadeEnd), float2(0, 1)));</span>
@@ -942,7 +942,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
     //Stars
         float2 starsUV = normWorldPos.xz / (normWorldPos.y + _StarBending);
-                <span class="addition">float stars</span> = tex2D(_StarTex, starsUV * _StarTex_ST.xy + _StarTex_ST.zw).<span class="addition">r;
+        <span class="addition">float stars</span> = tex2D(_StarTex, starsUV * _StarTex_ST.xy + _StarTex_ST.zw).<span class="addition">r;
         //invert the voronoi
         stars = 1 - stars;
         //and then raise the value to a power to adjust the brightness falloff of the stars
@@ -1034,7 +1034,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
             <div class="CodeHighlight">
 <pre>
-                <code class="language-hlsl">[Header(SkyAndSun)]
+    <code class="language-hlsl">[Header(SkyAndSun)]
     [KeywordEnum(None, Simple, High Quality)] _SunDisk ("Sun", Int) = 2
     _SunSize ("Sun Size", Range(0,1)) = 0.04
     _SunSizeConvergence("Sun Size Convergence", Range(1,10)) = 5
@@ -1042,7 +1042,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     _SkyTint ("Sky Tint", Color) = (.5, .5, .5, 1)
     _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
     _Exposure("Exposure", Range(0, 8)) = 1.3
-                <span class="addition">_NightStartHeight("Night Start Height", Range(-1, 1)) = -.1
+    <span class="addition">_NightStartHeight("Night Start Height", Range(-1, 1)) = -.1
     _NightEndHeight("Night End Height", Range(-1, 1)) = -.2</span>
     _SkyFadeStart("Sky Fade Start", Range(-1, 1)) = .05
     _SkyFadeEnd("Sky End Start", Range(-1, 1)) = -.05
@@ -1055,7 +1055,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     uniform half _SunSizeConvergence;
     uniform half3 _SkyTint;
     uniform half _AtmosphereThickness;
-                <span class="addition">uniform half _NightStartHeight, _NightEndHeight;</span>
+    <span class="addition">uniform half _NightStartHeight, _NightEndHeight;</span>
     uniform half _SkyFadeStart, _SkyFadeEnd;
 
 ...
@@ -1065,7 +1065,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     float horizonValue = dot(normWorldPos, float3(0, 1, 0));
     horizonValue = 1 - saturate(Remap(horizonValue, float2(_SkyFadeStart, _SkyFadeEnd), float2(0, 1)));
 
-                <span class="addition">//grab the sun position
+    <span class="addition">//grab the sun position
     float3 sunPos = _WorldSpaceLightPos0.xyz;
 
     //and then do a similar method as the horizon to figure out when things should transistion to the night colors
@@ -1220,7 +1220,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     _StarBending("Star Bending", Range(0, 1)) = 1
     _StarBrightness("Star Brightness", Range(0, 100)) = 8.5
 
-                <span class="addition">[Header(Moon)]
+    <span class="addition">[Header(Moon)]
     _MoonTex("Moon Tex", 2D) = "white" {} 
     _MoonRadius ("Moon Radius", Range(0, 1)) = .2</span>
 
@@ -1228,7 +1228,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
     #include "UnityCG.cginc"
     #include "Lighting.cginc"
-                <span class="addition">#include "Includes/MoonFunctions.cginc"</span>
+    <span class="addition">#include "Includes/MoonFunctions.cginc"</span>
     #include "Includes/Scattering.cginc"
 
 ...
@@ -1237,7 +1237,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
     uniform float4 _StarTex_ST;
     uniform float _StarBending, _StarBrightness;
 
-                <span class="addition">uniform sampler2D _MoonTex;
+    <span class="addition">uniform sampler2D _MoonTex;
     float4 _MoonTex_ST;
     float _MoonRadius;</span>
 
@@ -1379,7 +1379,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 <pre><code class="language-hlsl">[Header(Moon)]
     _MoonTex("Moon Tex", 2D) = "white" {}
     _MoonRadius ("Moon Radius", Range(0, 1)) = .2
-                <span class="addition">_MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
+    <span class="addition">_MoonOrbitAngle("Moon Orbit Start Angle (XYZ)", vector) = (0, 0, 45, 0)
     _MoonOrbitSpeed("Moon Orbit Speed", Range(-1, 1)) = .05
     _MoonSemiMajAxis("Moon Semi Major Axis", float) = 1
     _MoonSemiMinAxis("Moon Semi Minor Axis", float) = 1</span>
@@ -1388,26 +1388,26 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
     uniform sampler2D _MoonTex;
     uniform float4 _MoonTex_ST;
-                <span class="addition">uniform float4 _MoonOrbitAngle;</span>
+    <span class="addition">uniform float4 _MoonOrbitAngle;</span>
     uniform float _MoonRadius;
-                <span class="addition">uniform float _MoonOrbitSpeed, _MoonSemiMajAxis, _MoonSemiMinAxis;</span>
+    <span class="addition">uniform float _MoonOrbitSpeed, _MoonSemiMajAxis, _MoonSemiMinAxis;</span>
 
 ...
 
-//Moon
-                <span class="deletion"><span class="addition">float3 currentMoonPos = float3(1, 0, 0);</span></span>
+    //Moon
+        <span class="deletion"><span class="addition">float3 currentMoonPos = float3(1, 0, 0);</span></span>
 
-                <span class="addition">float orbitAngle = _Time.y * _MoonOrbitSpeed;
+        <span class="addition">float orbitAngle = _Time.y * _MoonOrbitSpeed;
             
-    //we also need to grab the half radius of the ellipse at the major and minor Axis
-    //these are used in the ellipse equation.
-    float2 MajMinAxis = float2(_MoonSemiMajAxis, _MoonSemiMinAxis);
+        //we also need to grab the half radius of the ellipse at the major and minor Axis
+        //these are used in the ellipse equation.
+        float2 MajMinAxis = float2(_MoonSemiMajAxis, _MoonSemiMinAxis);
 
-    //this equation takes these values along with the _MoonOrbitAngle to figure out the position in the moons orbit
-    float3 currentMoonPos = GetOrbitPosition(_MoonOrbitAngle, MajMinAxis, orbitAngle);</span>  
+        //this equation takes these values along with the _MoonOrbitAngle to figure out the position in the moons orbit
+        float3 currentMoonPos = GetOrbitPosition(_MoonOrbitAngle, MajMinAxis, orbitAngle);</span>  
 
-    float radius = _MoonRadius;
-    float sphere = SphereIntersect(float3(0, 0, 0), normWorldPos, currentMoonPos, radius);
+        float radius = _MoonRadius;
+        float sphere = SphereIntersect(float3(0, 0, 0), normWorldPos, currentMoonPos, radius);
 
 </code>
 </pre>
@@ -1840,6 +1840,253 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
 
             <h2 class="Section" id="Part5">Part 5: Clouds</h2>
 
+            <p class="PageText">
+                The clouds for our shader will be generated from a noise texture. The look of your clouds will largely depend on the texture you use. I made mine in Gimp.
+                My process was to start with a blank square image. Then go to <strong>Filters > Render > Noise > Solid Noise</strong>. In the settings check tileable and 
+                turbulent. Then turn the detail way up, I set mine to 10. Then mess with the scale and seed until you are happy. Then go over to <strong>Colors > 
+                Brightness-Contrast</strong> and play with the contrast setting to your liking. I did this to create more space between the bright areas in the texture,
+                 which leads to space between the clouds in our sky. I ended up with this, but experimentation here will yield different results.
+            </p>
+
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/cloudDiffuse.png" alt="Our cloud texture" />
+                    <p class="PageImageText"> Cloud noise texture used for our skybox.</p>
+            </div>
+
+            <p class="PageText">
+                To add some extra detail to our clouds we will also sample a normal map and do some basic faux lighting. To do this we will use another noise texture. Make a
+                second noise texture but use different settings so we get different details than our first texture. Then in Unity, change the import settings to normal map, check
+                the <strong>Create from Grayscale</strong> and adjust the bumpiness to your liking, I set mine to 0.15. Here is the texture I used for the normal map.
+            </p>
+
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/cloudBump.png" alt="Our cloud normal texture" />
+                    <p class="PageImageText"> Cloud noise texture used for our cloud&rsquo;s normals.</p>
+            </div>
+
+            <p class="PageText">
+                Now we can get to the actual cloud code. What we will do is sample our cloud texture twice but at different points and scale. We will do this for the normals
+                and the regular textures. To get uvs we will use the same method we did for our stars but with a separate <code>_CloudBending</code> property so that they can be
+                independent. To sample the textures at different points we will add some properties to control how the textures are scaled and translated over time and we will
+                add a property to control what direction they translate in. A lot of this could be adjusted to fit whatever particular effect you want to generate. Then once
+                we have our texture samples we will blend them
+            </p>
+
+            <p class="PageText">
+                To blend these texture samples we will use some remapping of values, subtraction, and a smoothstep for our diffuse textures, and we will use Unity&rsquo;s White out
+                blending function <code>BlendNormals</code>.
+                The idea behind the remapping is that our texture values range from 0 to 1. So, we can darken our final result by subtracting the second sample from our first
+                sample. But by remapping the value to be between two user-controlled values we can control how much our final result is affected by this blending. Then we will
+                <code>smoothstep</code> the result of this blending between two more user-controlled values to brighten the final result. So, to get started, add the following code
+                to our shader. We are adding a lot of properties to allow a lot of control over how the textures are sampled and then ultimately blended together.
+            </p>
+
+<div class="CodeHighlight">
+<pre>
+<code class="language-hlsl">    <span class="addition">_SkyFadeStart("Sky Fade Start", Range(-1, 1)) = .05
+    SkyFadeEnd("Sky End Start", Range(-1, 1)) = -.05</span>
+
+    [Header(Clouds)]
+    _CloudDiffuse("Cloud Diffuse", 2D) = "black" {}
+    [NoScaleOffset]_CloudNormal("Cloud Normal", 2D) = "bump" {}
+    _CloudAlphaCutoff("Cloud Alpha Thresh", Range(0, 1)) = 0.2
+    _CloudAlphaMax("Cloud Alpha Max", Range(0, 1)) = .5
+    _CloudNormalSpeed("Cloud Normal Speed", Range(0, 1)) = .1
+    _CloudSpeed("Cloud Speed", float) = .001
+    _CloudDirection("Cloud Direction", float) = 0
+    _CloudBending("Cloud Bending", Range(0, 1)) = .25
+    _CloudBlendSpeed("Cloud Blend Speed", float) = -.02
+    _CloudBlendScale("Cloud Blend Scale", float) = 1
+    _CloudBlendLB("Cloud Blend LB", Range(0, 1)) = .17
+    _CloudBlendUB("Cloud Blend UB", Range(0, 1)) = .32
+
+...
+
+    <span class="addition">uniform half _SkyFadeStart, _SkyFadeEnd;</span>
+
+    uniform sampler2D _CloudDiffuse, _CloudNormal;
+    uniform float4 _CloudDiffuse_ST, _CloudNormal_ST;
+    uniform float _CloudSpeed, _CloudBlendSpeed;
+    uniform float _CloudNormalScale;
+    uniform float _CloudAlphaMax, _CloudAlphaCutoff;
+    uniform float _CloudBending;
+    uniform float _CloudDirection, _CloudBlendScale, _CloudBlendLB, _CloudBlendUB, _CloudNormalSpeed;
+
+...
+
+        <span class="addition">#if defined(UNITY_COLORSPACE_GAMMA) && !SKYBOX_COLOR_IN_TARGET_COLOR_SPACE
+            col.rgb = LINEAR_2_OUTPUT(col);
+        #endif
+
+    //End of Unity Code</span>
+
+    //Clouds             
+        //by dividing the xz by the y we can project the coordinate onto a flat plane, the bending value transitions it from a plane to a sphere
+        float2 cloudUV = normWorldPos.xz / (normWorldPos.y + _CloudBending);
+
+        //this is just a simple way to rotate the direction the clouds will travel in
+        float2 cloudDir = float2(1, 0);
+        cloudDir.x = cloudDir.x * cos(radians(_CloudDirection));
+        cloudDir.y = cloudDir.y * sin(radians(_CloudDirection));
+
+        //sample the cloud texture twice at different speeds, offsets and scale, the float2 here just makes so they dont ever line up exactly
+        float cloud1 = tex2D(_CloudDiffuse, cloudUV * _CloudDiffuse_ST.xy + _CloudDiffuse_ST.zw + _Time.y * _CloudSpeed * cloudDir).x * horizonValue;
+        float cloud2 = tex2D(_CloudDiffuse, cloudUV * _CloudDiffuse_ST.xy * _CloudBlendScale + _CloudDiffuse_ST.zw - _Time.y * _CloudBlendSpeed * cloudDir + float2(.373, .47)).x * horizonValue;
+        
+        //we remap the clouds to be between our two values. This allows us to have control over the blending
+        cloud2 = Remap(cloud2, float2(0, 1), float2(_CloudBlendLB, _CloudBlendUB));
+
+        //subtract cloud2 from cloud1, this is how we blend them. We could also mulitple them but I like the result of this better
+        float clouds = cloud1 - cloud2;
+
+        //then we smoothstep the clouds at desired values, this allows us control the brightness and the edge of the clouds
+        clouds = smoothstep(_CloudAlphaCutoff, _CloudAlphaMax, clouds);
+
+        //do the same thing except we slow the speed because it can look wierd if moving to fast
+        float3 cloudNormal1 = UnpackNormal(tex2D(_CloudNormal, cloudUV * _CloudDiffuse_ST.xy + _CloudDiffuse_ST.zw + _Time.y * _CloudSpeed * cloudDir));
+        float3 cloudNormal2 = UnpackNormal(tex2D(_CloudNormal, cloudUV * _CloudDiffuse_ST.xy * _CloudBlendScale + _CloudDiffuse_ST.zw - _Time.y * _CloudBlendSpeed * _CloudNormalSpeed * cloudDir + float2(.373, .47)));
+
+        //blend normals
+        float3 cloudNormal = BlendNormals(cloudNormal1, cloudNormal2);
+
+    <span class="addition">//Moon
+        float orbitAngle = _Time.y * _MoonOrbitSpeed;</span>
+</code>
+</pre>
+
+    <p class="PageImageText">
+                    Highlighted code here is code that was already in the shader. Included to provide a reference to where the code goes.
+                </p>
+</div>
+
+            <p class="PageText">
+                The idea behind the blending of our diffuse textures is that our texture values range from 0 to 1. So, we can darken our final result by subtracting the second sample from our first 
+                sample. But by remapping the value to be between two user-controlled values we can control how much our final result is affected by this blending. Then we will
+                <code>smoothstep</code> the result of this blending between two more user-controlled values to brighten the final result. It isn&rsquo;t any technical process,
+                it is more that it produces a result that I was happy with.
+            </p>
+
+            <p class="PageText">
+                Now we need to include this in the final color of the pixel. I mentioned using faux lighting because we will just use the dot product of our cloud normal
+                and an up vector to create lighting. I like this because then when the sun is set the light position does not affect the cloud color, but you could change it
+                to use the light position or transition between either method. 
+            </p>
+
+            <p class="PageText">
+                We will also add day and night color properties that we will <code>lerp</code> between based off of the <code>night</code> value that we calculate earlier in the
+                fragment function. Then we can calculate the final color value by multiplying the faux lighting value by the color. Before this multiplication I did one more 
+                remap on the lighting value to allow control over how much the lighting affects the color. I also added one more line where we divide our color by a user-controlled
+                value that is in between 0 and 1 to provide a bit of a final brightness control to the cloud color. Then all we have to do is <code>lerp</code> between the <code>col</code>
+                value and our cloud color by our cloud value calculated from the textures.
+            </p>
+
+<div class="CodeHighlight">
+<pre>
+<code class="language-hlsl">    [Header(Clouds)]
+    _CloudDiffuse("Cloud Diffuse", 2D) = "black" {}
+    [NoScaleOffset]_CloudNormal("Cloud Normal", 2D) = "bump" {}
+    <span class="addition">_CloudColor("Cloud Color", Color) = (1, 1, 1, 1)
+    _CloudNightColor("Cloud Night Color", COLOR) = (.34, .34, .34, 1)</span>
+    _CloudAlphaCutoff("Cloud Alpha Thresh", Range(0, 1)) = 0.2
+    _CloudAlphaMax("Cloud Alpha Max", Range(0, 1)) = .5
+    <span class="addition">_CloudColorBoost("Cloud Color Boost", Range(0, 1)) = 0
+    _CloudNormalEffect("Cloud Normal Effect", Range(0, 1)) = .37</span>
+    _CloudNormalSpeed("Cloud Normal Speed", Range(0, 1)) = .1
+    _CloudSpeed("Cloud Speed", float) = .001
+    _CloudDirection("Cloud Direction", float) = 0
+    _CloudBending("Cloud Bending", Range(0, 1)) = .25
+    _CloudBlendSpeed("Cloud Blend Speed", float) = -.02
+    _CloudBlendScale("Cloud Blend Scale", float) = 1
+    _CloudBlendLB("Cloud Blend LB", Range(0, 1)) = .17
+    _CloudBlendUB("Cloud Blend UB", Range(0, 1)) = .32
+
+...
+
+    uniform sampler2D _CloudDiffuse, _CloudNormal;
+    uniform float4 _CloudDiffuse_ST, _CloudNormal_ST;
+    uniform float _CloudSpeed, <span class="addition">_CloudColorBoost</span>, _CloudBlendSpeed;
+    <span class="addition">uniform float3 _CloudColor, _CloudNightColor;</span>
+    uniform float _CloudNormalScale, <span class="addition">_CloudNormalEffect</span>;
+    uniform float _CloudAlphaMax, _CloudAlphaCutoff;
+    uniform float _CloudBending;
+    uniform float _CloudDirection, _CloudBlendScale, _CloudBlendLB, _CloudBlendUB, _CloudNormalSpeed;
+
+...
+
+    //blend normals
+    float3 cloudNormal = BlendNormals(cloudNormal1, cloudNormal2);
+
+    <span class="addition">//we blend the normal with the up vector. This dot product with up gives the final color the effect the clouds are fluffy
+    float NdotUp = dot(cloudNormal, float3(0, 1, 0));
+
+    //adjust the color for night
+    float3 cloudColor = lerp(_CloudColor, _CloudNightColor, night);
+
+    //then remap the dot product to be between our desired value, this reduces the effect of the normal
+    cloudColor = cloudColor * Remap(NdotUp, float2(-1, 1), float2(1 -_CloudNormalEffect, 1));
+            
+    //then divide by the color boost to brighten the clouds
+    cloudColor = saturate(cloudColor / (1 - _CloudColorBoost));
+
+    //finally lerp to the cloud color base on the cloud value
+    col.rgb = lerp(col.rgb, cloudColor, clouds);</span>
+</code>
+</pre>
+</div>
+
+            <p class="PageText">
+                The last thing we have to do is just to mask out everything properly now that all of the added features are in place. For the moon we will change the final
+                <code>lerp</code> to lerp by the horizon value multiplied by 1 minus the cloud value. And to the stars we will change how much of the stars value gets added
+                by multiplying it with 1 - the clouds value. This should mask everything out nicely. 
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-hlsl">    //so we grab the moon tex and multiple the color
+    float3 moonTex = tex2D(_MoonTex, moonUV).rgb * _MoonColor.rgb;
+
+    //then we lerp to the color be how much of the moon is lit
+    moonTex = lerp(col.rgb, moonTex * NDotL, saturate(NDotL));
+
+    //then lerp to the final color masking out anything uner the horizon and anywhere there is clouds as they should be infron of the moon
+    col.rgb = lerp(col.rgb, moonTex, horizonValue <span class="addition">* (1 - clouds)</span>);
+    
+...
+
+    //then adjust the final color
+    stars -= twinkle;
+    stars = saturate(stars);
+
+    //then lerp to the stars color masking out the horizon
+    col.rgb = lerp(col.rgb, col.rgb + <span class="addition">(stars * (1 - clouds))</span>, night * horizonValue * (1 - step(0, sphere)));
+    
+    return col;
+</code>
+</pre>
+</div>
+            <div class="PageImageContainer">
+                    <img class="PageImage" src="Media/CloudsSunset.png" alt="Our shader with clouds" />
+                    <p class="PageImageText"> Our finished shader with clouds and moon visible</p>
+            </div>
+
+            <h2 class="Section" id="Part6">Part 6: Wrap up</h2>
+
+            <p class="PageText">
+                And with that we have finished our modding Unity&rsquo;s procedural skybox. We have added stars, clouds, and a moon. It is fairly customizable and can fit
+                a variety of needs. I am sure somethings could be done differently and I would say feel free to experiment with it. A link to the final shader can be found
+                <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/tree/main/FinalShader" title="Link to final shader" target="_blank">here</a> and all the
+                textures that I used can be found <a href="https://github.com/FeralPug/FeralPug-Extending-the-Unity-Skybox/tree/main/Textures" title="Link to textures" target="_blank">here</a>.
+                I hope you found this helpful and maybe even useful.
+            </p>
+
+            <p class="PageText">
+                If you have any comments or something did not work for you, contact me via my
+                <a href="https://feralpug.github.io/OtherPages/Support/Support.html" title="link to support page" target="_blank">support page</a>
+                or DM me on twitter <a href="https://twitter.com/Feral_Pug" title="Link to my twitter page" target="_blank">@Feral_Pug</a>
+                and I should respond to you soon. If you want to support me you can donate at 
+                <a href="https://ko-fi.com/feral_pug" title="Link to my Ko-fi page" target="_blank">ko-fi.com/feral_pug</a>.
+            </p>
+
 
             <!-- these are here just so I can grab the right formatting as we write
 
@@ -1903,6 +2150,11 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
                     <li>
                         <a href="#Part5" title="Jump to part five">
                             Part 5: Clouds
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part6" title="Jump to part six">
+                            Part 6: Wrap up
                         </a>
                     </li>
                 </ul>
