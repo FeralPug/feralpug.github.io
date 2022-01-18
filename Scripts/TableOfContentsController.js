@@ -1,10 +1,3 @@
-//this makes the jumps slightly offset so that the nav bar doesn't cover the section header
-//window.addEventListener("hashchange", function () {
-    //window.scrollTo(window.scrollX, window.scrollY - 100);
-//});
-
-//this is better than the above because it doesn't matter if you are already at that anchor
-
 const tableOfContentsLinks = document.querySelectorAll(".AsideContainer a");
 
 for (let i = 0; i < tableOfContentsLinks.length; i++) {
@@ -101,4 +94,6 @@ var observer = new IntersectionObserver(callback, options);
 for (let i = 0; i < sections.length; i++) {
 	observer.observe(sections[i]);
 }
+
+window.addEventListener("scroll", observer.callback);
 

@@ -5,12 +5,6 @@ This is the original way we loaded the script < script src = "../../../../Prism/
 
 window.addEventListener("load", function () {
     if (window.innerWidth > 720) {
-        var prism = document.createElement('script');
-        prism.type = 'text/javascript';
-        prism.src = "../../../../Prism/prism.js";
-        prism.setAttribute("defer", "defer");
-
-        document.head.appendChild(prism);
 
         var tableOfContentsController = document.createElement("script");
         tableOfContentsController.type = 'text/javascript';
@@ -18,5 +12,18 @@ window.addEventListener("load", function () {
         tableOfContentsController.setAttribute("defer", "defer");
 
         document.head.appendChild(tableOfContentsController);
+
+        var prism = document.createElement('script');
+        prism.type = 'text/javascript';
+        prism.src = "../../../../Prism/prism.js";
+        prism.setAttribute("defer", "defer");
+
+        document.head.appendChild(prism);
+    }
+    else {
+        var aside = this.document.querySelector(".AsideContainer");
+        var asideClone = aside.cloneNode(true);
+        aside.parentElement.insertBefore(asideClone, aside.parentElement.firstChild);
+        console.log("HAZZUHU");
     }
 });
