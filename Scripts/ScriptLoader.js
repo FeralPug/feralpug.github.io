@@ -2,7 +2,6 @@
 we have to do this because prism can cause chrome to crash because it is adding so many elements to the DOM tree
 This is the original way we loaded the script < script src = "../../../../Prism/prism.js" defer ></script > */
 
-
 window.addEventListener("load", function () {
     if (window.innerWidth > 720) {
 
@@ -24,6 +23,5 @@ window.addEventListener("load", function () {
         var aside = this.document.querySelector(".AsideContainer");
         var asideClone = aside.cloneNode(true);
         aside.parentElement.insertBefore(asideClone, aside.parentElement.firstChild);
-        console.log("HAZZUHU");
     }
 });
