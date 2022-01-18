@@ -20,8 +20,12 @@ window.addEventListener("load", function () {
         document.head.appendChild(prism);
     }
     else {
+        /*this works but if the window gets resized then the desktop version has two aside containers on the left and right
+         * just need to take the time to write a script that watches for resize events and handles the aside container accordingly
+         * 
         var aside = this.document.querySelector(".AsideContainer");
         var asideClone = aside.cloneNode(true);
         aside.parentElement.insertBefore(asideClone, aside.parentElement.firstChild);
+        */
     }
 });

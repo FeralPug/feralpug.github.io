@@ -15,7 +15,7 @@ const sections = document.querySelectorAll(".Section");
 const tableOfContents = document.querySelector(".AsideContainer ul").children;
 
 let options = {
-	threshold: 1.0
+	threshold: [0.0, 1.0]
 }
 
 function compareNumbers(a, b) {
@@ -94,6 +94,4 @@ var observer = new IntersectionObserver(callback, options);
 for (let i = 0; i < sections.length; i++) {
 	observer.observe(sections[i]);
 }
-
-window.addEventListener("scroll", observer.callback);
 
