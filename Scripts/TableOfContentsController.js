@@ -15,7 +15,7 @@ const sections = document.querySelectorAll(".Section");
 const tableOfContents = document.querySelector(".AsideContainer ul").children;
 
 let options = {
-	threshold: 1.0;
+	threshold: 1.0
 }
 
 function compareNumbers(a, b) {
