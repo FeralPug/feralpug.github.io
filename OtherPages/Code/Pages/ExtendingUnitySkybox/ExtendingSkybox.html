@@ -420,16 +420,16 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </p>
 
             <p class="PageText">
-                First, we change the rendering queue and type to <q>Background</q>. This is to tell the shader to render this last. In Unity when opaque objects are drawn to the render target of
-                the camera they also draw into the stencil buffer. What this does is it tells Unity where stuff has been rendered, or conversely where stuff has not been rendered. It
-                then knows that it should draw the skybox in only those parts of the screen. The preview tag just changes how its preview looks in the inspector.
+                First, we change the rendering queue and type to <q>Background</q>. This is to tell the shader to render this first. In Unity, what ever the background is for the camera gets
+                rendered first, so that any pixel that does not get drawn will at least get the background drawn there. If our camera is set to draw the skybox as the background, Unity will
+                hook up the camera with the skybox material and draw it accordingly. The preview tag just changes how it&rsquo;s preview looks in the inspector.
             </p>
 
             <p class="PageText">
-                We do not want cull any part of skybox, although I assume it would not make a difference, and we do not want to write to the Zbuffer,
-                which could mess up post processing I suppose,
-                if we were doing any. We also need to include our <q>Scattering.cginc</q> file as that is where all the functions now live and we also have to add the <q>_SunSize</q>
-                and <q>_SunSizeConvergence</q> to the parameters list for the <q>calcSunAttenuation</q> method call in the frag function.
+                We do not want cull any part of skybox. I am not exactly sure how Unity draws the Skybox. My guess is that it draws a mesh that is equal to the view frustrum of the
+                camera, and so we would likely be drawing back faces. But if Unity sets their skybox to have no culling we will do the same. They probably know better. We also do not want
+                to write to the Zbuffer as we would want any geometry or transparent objects in the view of the camera to draw instead of the skybox. It probably doesn&rsquo;t matter as
+                anything beyond the skybox should be out of the camera&rsquo;s view, but I suppose it saves the render pipeline from having to write to the z-buffer. 
             </p>
 
             <p class="PageText">
