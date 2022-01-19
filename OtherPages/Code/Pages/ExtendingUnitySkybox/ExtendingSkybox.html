@@ -426,7 +426,7 @@ half calcSunAttenuation(half3 lightPos, half3 ray<span class="addition">, float 
             </p>
 
             <p class="PageText">
-                We do not want cull any part of skybox. I am not exactly sure how Unity draws the Skybox. My guess is that it draws a mesh that is equal to the view frustrum of the
+                We do not to want cull any part of skybox. I am not exactly sure how Unity draws the Skybox. My guess is that it draws a mesh that is equal to the view frustrum of the
                 camera, and so we would likely be drawing back faces. But if Unity sets their skybox to have no culling we will do the same. They probably know better. We also do not want
                 to write to the Zbuffer as we would want any geometry or transparent objects in the view of the camera to draw instead of the skybox. It probably doesn&rsquo;t matter as
                 anything beyond the skybox should be out of the camera&rsquo;s view, but I suppose it saves the render pipeline from having to write to the z-buffer. 
