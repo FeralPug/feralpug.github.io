@@ -23,9 +23,9 @@ function compareNumbers(a, b) {
 }
 
 let indexInView = -1;
+let indices = [];
 
 let callback = (entries) => {
-	let indices = [];
 	entries.forEach(entry => {
 		if (entry.isIntersecting) {
 			for (let k = 0; k < tableOfContents.length; k++) {
@@ -43,6 +43,12 @@ let callback = (entries) => {
 				var id = tableOfContents[k].firstElementChild.getAttribute("href");
 				if (id.length > 0) {
 					if (id.substring(1) === entry.target.getAttribute("id")) {
+						//we check to see if this index is in the indicies array and if so remove it
+						//keeping this array persistant allows for proper sorting when two elements are both on the screen
+						let index = indices.indexOf(k);
+						if (index > -1) {
+							indices.splice(index, 1);
+						}
 						if (indexInView === k) {
 							indexInView = -1;
                         }
