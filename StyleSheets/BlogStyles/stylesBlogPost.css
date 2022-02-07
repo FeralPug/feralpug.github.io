@@ -33,6 +33,10 @@ code {
     min-width: 0px;
 }
 
+.CodeHighlight + .CodeHighlight{
+    margin-top: 50px;
+}
+
 .addition mark.highlight {
     background-color: yellow;
     color: black;

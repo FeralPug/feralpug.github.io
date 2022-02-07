@@ -1,0 +1,862 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Feral_Pug Codes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../../../../StyleSheets/EveryPage/stylesGeneral.css" />
+    <link rel="stylesheet" href="../../../../StyleSheets/BlogStyles/stylesBlogPost.css" />
+    <link rel="stylesheet" href="../../../../Prism/prism.css" />
+    <script src="../../../../Scripts/markFixer.js" defer></script>
+    <script src="../../../../Scripts/ScriptLoader.js" defer></script>
+
+</head>
+<body>
+    <header>
+        <div class="Banner" id="Top">Feral_Pug Codes</div>
+    </header>
+
+    <div class="SocialNav">
+        <ul>
+            <li>
+                <a href="https://ko-fi.com/feral_pug" title="Link to my Ko-fi page" target="_blank">
+                    <img src="../../../../Media/Icons/Ko-fiLogo.png" alt="Ko-Fi Logo" width="32" />
+                </a>
+            </li>
+            <li>
+                <a href="https://twitter.com/Feral_Pug" title="Link to my twitter page" target="_blank">
+                    <img src="../../../../Media/Icons/twitterLogo.svg" alt="Twitter Logo" width="32" />
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="NavContainer">
+        <nav>
+            <ul>
+                <li>
+                    <a href="../../../../index.html">Home</a>
+                </li>
+                <li>
+                    <a href="../../../GamesPage/Games.html">Games</a>
+                </li>
+                <li>
+                    <a href="../../../Code/Code.html">Code Blog</a>
+                </li>
+                <li>
+                    <a href="../../../Tools/Tools.html">Tools</a>
+                </li>
+                <li>
+                    <a href="../../../Support/Support.html">Support</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <article>
+            <h1 class="Section" id="PostStart">
+                Trajectory Predictions and Particle Systems
+            </h1>
+
+            <p class="PageText">
+                Player feedback is important for making games. If the player is not sure what consequence a certain action will have the game can feel unfair, and not fun. One
+                instance of this is in a game where you throw some object through the air, maybe a golf game or something like Angry Birds. If the object of the game is to hit
+                stuff, it will not be very fun if you do not know where you are actually aiming. A while back I needed to do this exact thing and I had a hard time drumming up
+                high school physics or finding some resource online that gave me a quick, simple solution. So I wanted to write about how I achieved this.
+            </p>
+
+            <p class="PageText">
+                In this blog post I will cover the math behind calculating a trajectory, how to implement that in code, how we can add decals to geomtrey where our projectile
+                will collide with something, and how we can simulate physics in Unity to calculate complex trajectories.
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/PostCover.png" alt="Image of the final Result" />
+                <p class="PageImageText"> This is what our final product will look like. Notice the decals drawn where ever we have collisions</p>
+            </div>
+
+            <h2 class="Section" id="Part1">Part 1: Setting Up Our Projectile Scene</h2>
+
+            <p class="PageText">
+                To start we are just going to get a basic scene set up with ground, a player launcher object, and a few scripts to allow control over the launcher and fire
+                projectiles. I am guessing almost everyone reading this can set this up but I am going to go through it so anyone can use this post. If you want, skip to the
+                end of this section there will be a link to where you can download everything you need to get going with the next section. Just be sure to add a <q>Player</q>
+                layer and a <q>Projectile</q> layer, set the objects in the download to the appropriate layers and change the collision settings to stop these two layer
+                from interacting.
+            </p>
+
+            <p class="PageText">
+                To get setup make a new scene in Unity, add a plane, reset it&#39s transform and scale it up along all three axis. This will be our ground. Next create an empty
+                game object, name it something like Launcher or Player. Go up to layer and create a new layer, I called mine <q>Player</q> and then add our empty launcher object
+                to that layer. We do this because later we won&rsquo;t want our projectile colliding with our launcher as it exits the barrel. Then add a cube as a child to our
+                launcher object, scale it up a bit in the z-axis, I set it to <q>3</q>. And then move it along the z-axis a bit, I moved mine to z = <q>1</q>.
+            </p>
+
+            <div class="PageImageContainer">
+                <div class="ImageSideBySideContainer">
+                    <img class="PageSideBySide" src="Media/LauncherSetupScene.png" alt="Our launcher model in scene view" />
+                    <img class="PageSideBySide" src="Media/LauncherModelInspector.png" alt="The transform of our child cube object" />
+                </div>
+                <p class="PageImageText">
+                    On the left we have our scene view of our launcher model, and on the right we have the transform of the child cube we added.
+                </p>
+            </div>
+
+            <p class="PageText">
+                First we will create some simple controls for our launcher. We will limit these to rotation and firing our projectile. Make a script called <q>AimController</q>.
+                Add a public <code>Vector2</code> to control the rotation speed of our launcher. Then create a private <code>Rotate</code> function. Inside the function we will
+                grab the eulerAngles representation of our object&rsquo;s rotation. Then grab the horizontal and vertical input axis multiplied by the respective rotation speed and
+                deltaTime. Add the input amount to the eulerAngles we grabbed before and apply it back to our transform with <code>Quaternion.Euler()</code>. Then call the
+                function in update. Add the script to the root of the launcher object and set the rotation speed to what ever you like. I went with 45 for both x and y. This will
+                give us all the movement control we need. Your script should look like snippet below.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class AimController : MonoBehaviour
+{
+    public Vector2 rotSpeed;
+
+    // Update is called once per frame
+    void Update()
+    {
+        Rotate();
+    }
+
+    void Rotate()
+    {
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+
+        Vector3 desRot = new Vector3();
+        desRot.x = Input.GetAxis("Vertical") * rotSpeed.x;
+        desRot.y = Input.GetAxis("Horizontal") * rotSpeed.y;
+
+        desRot *= Time.deltaTime;
+
+        currentRotation += desRot;
+
+        transform.rotation = Quaternion.Euler(currentRotation);
+    }
+}
+</code>
+</pre>
+                <p class="PageImageText">
+                    Simple code to get rotation control for our launcher.
+                </p>
+            </div>
+
+            <p class="PageText">
+                Now to get get firing control for our launcher. First, add a sphere to our scene and give it a <code>RigidBody</code> component.
+                Create a new <code>Projectile</code> layer and add it to that new layer. I also added a black, metallic material to it to set it apart.
+                Then make a prefab out of that sphere
+                so that we have a projectile that our launcher can instantiate into the scene when we want to fire a new projectile. Then go Edit >
+                ProjectSettings > Physics and uncheck the box for the Player layer and the Projectile layer in the Layer Collision Matrix section. This will stop our projectile
+                from colliding with our launcher when it is first fired.
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CollisionMatrix.png" alt="Settings for the collision matrix" />
+                <p class="PageImageText"> Uncheck that box for the Player and Projectile layer. Ignore that Invisible layer, we will get to that later.</p>
+            </div>
+
+            <p class="PageText">
+                Now create two more scripts, one called <code>LaunchController</code> and the other called <code>ProjectileController</code>. The <code>LaunchController</code> will be
+                responsible for instantiating our projectile and the <code>ProjectileController</code> will provide us access to the <code>RigidBody</code> of the projectile
+                so that we can easily set it&rsquo;s velocity.
+            </p>
+
+            <p class="PageText">
+                The <code>ProjectileController</code> will just have a public <code>RigidBody</code> field that we will assign in the inspector so that we will have easy access to it
+                from the <code>LaunchController</code>. The <code>LaunchController</code> is pretty simple.
+                It will have two public fields, one for the initial speed of our projectile and one for the projectile prefab.
+                Then in update we check for a button press and if so we call a function that will instantiate an instance of our projectile prefab and set the velocity of
+                it&rsquo;s rigid body to be equal to the launchers forward vector times the initial speed. Add the <code>LaunchController</code> to the root of the launcher
+                object and add the <code>ProjectileController</code> to the projectile prefab.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class ProjectileController : MonoBehaviour
+{
+    public Rigidbody Rigidbody;
+}
+</code>
+</pre>
+                <p class="PageImageText">
+                    Our <code>ProjectileController</code>
+                </p>
+            </div>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class LaunchController : MonoBehaviour
+{
+    public float launchVelocity = 15f;
+    public ProjectileController projectilePrefab;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            LaunchProjectile();
+        }
+    }
+
+    void LaunchProjectile()
+    {
+        ProjectileController projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+
+        projectile.Rigidbody.velocity = transform.forward * launchVelocity;
+    }
+}
+</code>
+</pre>
+                <p class="PageImageText">
+                    And our <code>LaunchController</code>
+                </p>
+            </div>
+
+            <p class="PageText">
+                Add the <code>LaunchController</code> to the root of the launcher object and add the <code>ProjectileController</code> to the projectile prefab. Then assign
+                the <code>RigidBody</code> of the projectile to the public field of the <code>ProjectileController</code>. Then add the projectile prefab to the public field
+                of the <code>LaunchController</code> and you should be all set to launch spheres to your heart&rsquo;s content.
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/LauncherSetup.gif" alt="Launching projectiles" />
+                <p class="PageImageText"> OK we can launch stuff, now lets get to the math!</p>
+            </div>
+
+            <p class="PageText">
+                If everything went right for you, you should have something similar to the above gif. If you skipped ahead, or something is not working,
+                you can grab the package for this scene and all of the code
+                <a href="https://github.com/FeralPug/TrajectoryPredictions/tree/main/Part1:%20Setup" title="Link to resources on github" target="_blank">here</a>.
+                Just make sure you set the layers and physics settings accordingly.
+            </p>
+
+            <h2 class="Section" id="Part2">Part 2: Trajectory Math</h2>
+
+            <p class="PageText">
+                Ok, so now that we have a way to launch objects lets start talking about how we can calculate the trajectory of our projectile. To do this we need two equations.
+                We need one to determine the horizontal position of the projectile as a function of time, and we need another one for the vertical position. Then we can
+                add these two positions together and get our position at any time. For now we will assume only gravity acts on our projectile.
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/PositionEquations.png" alt="Position equations" />
+                <p class="PageImageText">
+                    The two equations we need to calculate the posision of our projectile. On top we have our horizontal position and
+                    on bottom we have our vertical position. Pos is the final position, Pos<sub>0</sub> is the starting position, V<sub>0</sub> is the starting velocity,
+                    t is time, and g is gravity.
+                </p>
+            </div>
+
+            <p class="PageText">
+                These equations make sense to us. We start at some position, we move by some velocity every unit of time, and if we have acceleration our velocity is changed
+                by some amount every unit of time. The gravity term looks a little funny but if you have ever taken calculus, it is just the power rule going on. And if you
+                have not taken calculus, don&rsquo;t worry, we do not need to have a complete understanding of these equations. To use these equations we are missing something
+                though, we need the velocity broken down into vertical and horizontal components.
+            </p>
+
+            <p class="PageText">
+                Because Unity can provides us with a normalized Vector3 for our launch direction, we could cheat to get these two velocities. Actually we have three, X, Y,
+                and Z. The X, Y, and Z components of this Vector3 are the X, Y, and Z components of any point on the unit circle, or sphere.
+                We could just multiply them by the total initial velocity and that would give us the horizontal and vertical components in all three directions.
+                However, I think it is worth while to understand the triganometry of actauly calculating these vectors on their own, as understanding these is useful in
+                a lot of different game developement programming.
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/ProjectileMotionGraphic.png" alt="Visual representation of our projectile motion" />
+                <p class="PageImageText">
+                    This is the real problem we are solving. We need to figure out that launch angle and then we can use math to get the
+                    horizontal and vertical components. Photo credit toppr.com.
+                </p>
+            </div>
+
+            <p class="PageText">
+                If we can remember our triganometry from high school, we remember that the <code>sin</code> of the angle equals the length of the opposite side of the triangle
+                divided by the hypotenuse of the triangle. So the sin of the angle multiplied by the length of the hypotenuse, or our launch speed, is our vertical initial
+                velocity. For our horizontal velocity we do the same but with the <code>cos</code> because the cos of the angle equals the adjacent side of the triangle
+                divided by the hypotenuse of the triangle. The cos of the angle multiplied by our launch speed is our initial horizontal velocity. We then would just need to
+                break that down into the X and Z components. Easy! To get the angle we just work backwards. We know the Y component of our launch direction. The <code>arcsin</code>
+                of this gives of the angle off of the horizon. Also easy!
+            </p>
+
+            <p class="PageText">
+                In code all we have to do is calculate these velocities following the above logic and then use the two formulas from above to get the virtical and horizonal
+                parts of our position and add them together. There is just one small problem, time. How long do we do this for. It would be helpful if we could know how long
+                until we were going to hit the ground. Well, when our Y position = 0 we know we are hitting the ground. If we set that second forumla equal to 0 it looks a lot
+                like the condition for using the quadratic formula to solve for t. And it is! We can use the quadratic formula to solve for t!
+            </p>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/QuadraticFormula.png" alt="Launching projectiles" />
+                <p class="PageImageText">
+                    Substitue t for x and this is exactly the problem we have to solve.
+                </p>
+            </div>
+
+            <p class="PageText">
+                And with that we have all the logic we need to calulate our trajectory. We figure out our initial velocities, solve for how long our projectile will be in the
+                air, and then step through the position formulas at what ever pace we want to get the positions along our trajectory. All we have to do is write this in code.
+            </p>
+
+            <h2 class="Section" id="Part3">Part 3: Writing the Code</h2>
+
+            <p class="PageText">
+                So the things we need are our launch direction, our launch angle, our initial velocity, and the variables for the quadratic formula: a, b, and c. To do this,
+                create a <code>TrajectoryCalculator</code> script. Remove the inheritance from Monobehavior, delete the <code>Start</code> and <code>Update</code> methods and
+                make the <code>TrajectoryCalculator</code> at <code>static class</code>. We will put all of the methods for getting the information about our trajectory in this
+                class and because it is static any object can easily get access to these methods. Lets first get the launch direction, and the launch angle. Add a method for
+                getting the launch direction and a method for calculating the launch angle from that direction. Lets keep all of this private because we will provide a single
+                public method that other objects can use to interface with our calculator.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">using UnityEngine;
+
+public static class TrajectoryCalculator
+{
+    static Vector3 GetLaunchDirection(Transform launchTransform)
+    {
+        return launchTransform.forward;
+    }
+
+    static float GetLaunchAngle(Vector3 launchDirection)
+    {
+        return Mathf.Asin(launchDirection.y);
+    }
+}
+</code>
+</pre>
+                <p class="PageImageText">
+                    The simple start of our calculator. We could get away with not having methods for these calculations but it makes it easy to change later how these
+                    parts of the process work. For example if we wanted to change how we calculate the launch direction we would just need to change this method and not
+                    any code that uses it.
+                </p>
+            </div>
+
+            <p class="PageText">
+                Now what we will do is declare a public static method that will take a some parameters that our <code>LaunchController</code> has and processes them to give us
+                the needed information about out trajectory. We will have it return a <code>TrajectoryInfo</code> struct that will contain all of this information. Lets declare
+                that in its own file because it will be used by our <code>LaunchController</code> as well. So create this script in Unity. This struct will contain the launch
+                direction, the launch position, the initial speed, the launch angle, and the time to floor or ground.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">using UnityEngine;
+
+public struct TrajectoryInfo
+{
+    public Vector3 LaunchDirection { get; private set; }
+    public Vector3 StartingPosition { get; private set; }
+    public float InitialHorizontalSpeed { get; private set; }
+    public float InitialVerticalSpeed { get; private set; }
+    public float TimeToFloor { get; private set; }
+
+    public TrajectoryInfo(Vector3 launchDirection, Vector3 startingPos, float initialSpeed, float launchAngle, float timeToFloor)
+    {
+        LaunchDirection = launchDirection;
+        StartingPosition = startingPos;
+        InitialHorizontalSpeed = Mathf.Cos(launchAngle) * initialSpeed;
+        InitialVerticalSpeed = Mathf.Sin(launchAngle) * initialSpeed;
+        TimeToFloor = timeToFloor;
+    }
+}
+</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                Now before we write our <code>GetTrajectoryInfo</code> method in our calculator we need to write the code to get what I am calling <code>TimeToFloor</code>.
+                To do this we will add a private struct to our calculator class that will hold the variables of the quadratic formula. Then we will pass an instance of this
+                struct into a method that will use the quadratic formula to calculate the time to floor. The code for the method that calculates the quadratic formula is pretty
+                straight forward but I will point out a few things.
+            </p>
+
+            <p class="PageText">
+                First lets say we want to solve for a time besides when y = 0. This y = 0 constraint is kind of limiting. If our ground is at a height of -5 for example and not
+                0 this doesn&rsquo;t really help. But we can fix this by setting y to what ever height we want in our quadradic formula and then subtracting that height from
+                both sides of the equation. So instead of C in our equation equaling the starting height of our projectile, C will equal the starting height minus the floor,
+                what ever that may be. This allows us a bit more freedom in using this calculation.
+            </p>
+
+            <p class="PageText">
+                The second thing to be aware of is that square root. We do not want to try and take the square root of a negative number as it will return <code>NAN</code>.
+                This would only happen if we either turned off gravity or if we set the floor to a height higher than our projectile will go. Both of these are very edge cases
+                that we can mostly ignore. But we should check to see if we are going to take the square root of a negative number before we do it, and return -1 if we are so that
+                what ever is calling the method can be aware that we are not providing valid trajectory info.
+            </p>
+
+            <p class="PageText">
+                With that being said add the following to our <code>TrajectoryCalculator</code> class.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">  static QuadParams GetQuadParams(float initialVelocity, float projectileAngle, float startingHeight, float floor)
+    {
+        float a = .5f * Physics.gravity.y;
+        float b = initialVelocity * Mathf.Sin(projectileAngle);
+        float c = startingHeight - floor;
+
+        return new QuadParams(a, b, c);
+    }
+
+    static float GetTimeToFloor(QuadParams quadParams)
+    {
+        float determinant = (quadParams.B * quadParams.B) - (4 * quadParams.A * quadParams.C);
+
+        if (determinant < 0)
+        {
+            Debug.LogWarning("Trying to take square root of negative number, check gravity in physics settings!!!");
+            return -1;
+        }
+        else
+        {
+            determinant = Mathf.Sqrt(determinant);
+        }
+
+        return (-quadParams.B - determinant) / (2 * quadParams.A);
+    }
+
+    struct QuadParams
+    {
+        public float A { get; private set; }
+        public float B { get; private set; }
+        public float C { get; private set; }
+
+        public QuadParams(float a, float b, float c)
+        {
+            A = a;
+            B = b;
+            C = c;
+        }
+    }
+</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                Now all we have to do is add the <code>GetTrajectoryInfo</code> method to our calculator class and our launcher can get the information it needs to describe
+                the trajectory of the projectile. Add the following to our <code>TrajectoryCalculator</code> class.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">  public static TrajectoryInfo GetTragectoryInfo(Transform fireTransform, float initialSpeed, float startingHeight, float floor)
+    {
+        //we get the fireDirection from the forward of the fireTransform
+        Vector3 fireDirection = GetLaunchDirection(fireTransform);
+
+        //then we use that to get the fire angle off the horizon
+        float fireAngle = GetLaunchAngle(fireDirection);
+
+        //then with that info and some of the original parameters we can calculate a, b, and c of the quadratic formula
+        //the QuadParams struct just wraps those up together for us
+        QuadParams quadParams = GetQuadParams(initialSpeed, fireAngle, startingHeight, floor);
+
+        //then we can use that to get the timeToFloor
+        float timeToFloor = GetTimeToFloor(quadParams);
+
+        //and then we have all the info to describe the trajectory of our projectile
+        return new TrajectoryInfo(fireDirection, fireTransform.position, initialSpeed, fireAngle, timeToFloor);
+    }
+</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                Before we return to our <code>LaunchController</code> we still have one more thing to do. We need to use this trajectory info to calculate the points along
+                the trajectory. Now our launcher could do this but I like having the calculator do this for us. Our <code>LaunchController</code> could start to get complicated
+                as our game gets more complicated. Also other objects might want to be able to do this and that would mean we have to re-write this code in every class that
+                wants to do trajectory calculations.
+            </p>
+
+            <p class="PageText">
+                So with that being said lets add a function that will step through our trajectory storing the positions in a Vector3 array. We pass in the trajectory info,
+                the number of points we want to record, and array that can store the points. The array is an <code>out</code> type because later we will want to return
+                different data from this function. It is not completely necessary as an array is a reference type but I like to this it helps communicate how this function
+                works a little better. Then we calculate the time step for our trajectory, size the array, and calculate the positions using our two original formulas
+                that we talked about earlier in a for loop.
+            </p>
+
+            <p class="PageText">
+                The only thing to note is
+                that we have to adjust our horizontal velocity. This is because we split our total velocity into vertical and horizontal, not X, Y, and Z components. We could
+                easily change the other parts of our code, and probably should, but I wanted to highlight the triganometry, and the extra cpu cycles for this is pretty small.
+                Add the following code to our <code>TrajectoryCalculator</code> class.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">  //this formula takes in out trajectory info and some info and calculates the positions along the trajectory
+    public static void GetTrajectoryPoints(TrajectoryInfo trajectoryInfo, int resolution, out Vector3[] points)
+    {
+        //calculate the time between points on our trajectory
+        float timeStep = trajectoryInfo.TimeToFloor / resolution;
+
+        //and assign the points array to have the correct size, we use + 1 because we want to go all the way to the floor
+        points = new Vector3[resolution + 1];
+
+        //we have to use the normalized vector of the horizontal components of our fireDirection, because they need to have a magnitude of 1
+        //unless there is no horizontal comonent
+        Vector2 horizontal = new Vector2(trajectoryInfo.LaunchDirection.x, trajectoryInfo.LaunchDirection.z);
+        if (horizontal.sqrMagnitude != 0f)
+        {
+            horizontal = horizontal.normalized;
+        }
+
+        //then we just step through assigning all of the points
+        for (int i = 0; i < points.Length; i++)
+        {
+            //current time of along trajectory
+            float currentTime = timeStep * i;
+
+            //then we just need to brake it down into x and z components by using the direction
+            float xPart = horizontal.x * trajectoryInfo.InitialHorizontalSpeed;
+            float zPart = horizontal.y * trajectoryInfo.InitialHorizontalSpeed;
+
+            //and apply the time to get the x and y positions
+            float xPos = xPart * currentTime + trajectoryInfo.StartingPosition.x;
+            float zPos = zPart * currentTime + trajectoryInfo.StartingPosition.z;
+
+            //then for the y position we just use the formula from above
+            float yPos = trajectoryInfo.StartingPosition.y + trajectoryInfo.InitialVerticalSpeed * currentTime + (.5f * Physics.gravity.y) * (currentTime * currentTime);
+
+            Vector3 point = new Vector3(xPos, yPos, zPos);
+            points[i] = point;          
+        }
+    }
+</code>
+</pre>
+            </div>
+
+
+            <p class="PageText">
+                Now lets go back to our launcher object. Add a <code>LineRenderer</code> component to the root object and set the setting as you like. We are going to create
+                a <code>TrajectoryDrawer</code> class that we will add to our launcher that will be responsible for getting the trajectory positions and assigning them to the
+                positions of the line renderer. To start we will create a struct in this class that will hold the drawing settings, for now the resolution of our trajectory and
+                the floor. Then we will also add private fields for the <code>LaunchController</code> and the <code>LineRenderer</code> along with a <code>Vector3[]</code>. We
+                will grab the needed references in <code>Awake</code>.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">using UnityEngine;
+
+[RequireComponent(typeof(LineRenderer), typeof(LaunchController))]
+public class TrajectoryDrawer : MonoBehaviour
+{
+    public TrajectoryDrawingSettings drawSettings;
+
+    [System.Serializable]
+    public struct TrajectoryDrawingSettings
+    {
+        public int resolution;
+        public float floor;
+    }
+
+    LineRenderer lineRenderer;
+    LaunchController launchController;
+
+    Vector3[] points;
+
+    private void Awake()
+    {
+        lineRenderer = GetComponent&#60LineRenderer&#62();
+        launchController = GetComponent&#60LaunchController&#62();
+    }
+}
+</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                OK, now in update we will call a method that will get the trajectory info, and if we get a valid trajectory back we will get the points along the trajectory
+                and then assign them to the line renderer. And if you haven&rsquo;t already, add the <code>TrajectoryDrawer</code> component to our launcher object.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">  private void Update()
+    {
+        CalculateTrajectoryPath();
+    }
+
+    void CalculateTrajectoryPath()
+    {
+        TrajectoryInfo trajectoryInfo = TrajectoryCalculator.GetTragectoryInfo(transform, launchController.launchVelocity, transform.position.y, drawSettings.floor);
+
+        if (trajectoryInfo.TimeToFloor >= 0)
+        {
+            TrajectoryCalculator.GetTrajectoryPoints(trajectoryInfo, drawSettings.resolution, out points);
+        }
+
+        lineRenderer.positionCount = points.Length;
+        lineRenderer.SetPositions(points);
+    }
+</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                Now one little optimization we will make is to only calculate the trajectory if our launchers transform has changed. Otherwise we will just be calculating the
+                same data that we already have. In <code>TrajectoryDrawer</code> we will add a private bool that will keep track of if we need to recalculate the
+                trajectory. We will also add a public method to set this bool. Then in the <code>AimController</code> we will grab a reference to the TrajectoryDrawer
+                and if we have changed our rotation we will tell the TrajectoryDrawer that we need to recalculate the trajectory. Make the following changes.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class TrajectoryDrawer : MonoBehaviour
+{
+    public TrajectoryDrawingSettings drawSettings;
+
+    [System.Serializable]
+    public struct TrajectoryDrawingSettings
+    {
+        public int resolution;
+        public float floor;
+    }
+
+    LineRenderer lineRenderer;
+    LaunchController launchController;
+
+    Vector3[] points;
+
+                <span class="addition">bool isDirty;
+
+    public void SetDirty()
+    {
+        isDirty = true;
+    }</span>
+
+    private void Awake()
+    {
+        lineRenderer = GetComponent&#60LineRenderer&#62();
+        launchController = GetComponent&#60LaunchController&#62();
+    }
+
+    private void Update()
+    {
+                <span class="addition">if (isDirty)
+        {</span>
+            CalculateTrajectoryPath();
+                <span class="addition">}</span>
+    }
+
+    void CalculateTrajectoryPath()
+    {
+        TrajectoryInfo trajectoryInfo = TrajectoryCalculator.GetTragectoryInfo(transform, launchController.launchVelocity, transform.position.y, drawSettings.floor);
+
+        if (trajectoryInfo.TimeToFloor >= 0)
+        {
+            TrajectoryCalculator.GetTrajectoryPoints(trajectoryInfo, drawSettings.resolution, out points);
+        }
+
+        lineRenderer.positionCount = points.Length;
+        lineRenderer.SetPositions(points);
+    }
+}
+</code>
+</pre>
+            </div>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class AimController : MonoBehaviour
+{
+    public Vector2 rotSpeed;
+
+                <span class="addition">TrajectoryDrawer trajectoryDrawer;
+
+    private void Awake()
+    {
+        trajectoryDrawer = GetComponent&#60TrajectoryDrawer&#62();
+    }</span>
+
+    // Update is called once per frame
+    void Update()
+    {
+        Rotate();
+    }
+
+    void Rotate()
+    {
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+
+        Vector3 desRot = new Vector3();
+        desRot.x = Input.GetAxis("Vertical") * rotSpeed.x;
+        desRot.y = Input.GetAxis("Horizontal") * rotSpeed.y;
+     
+                <span class="addition">if(desRot != Vector3.zero && trajectoryDrawer != null)
+        {
+            trajectoryDrawer.SetDirty();
+        }</span>
+
+        desRot *= Time.deltaTime;
+
+        currentRotation += desRot;
+
+        transform.rotation = Quaternion.Euler(currentRotation);
+    }
+}
+</code>
+</pre>
+            </div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/TrajectoryPredicted.gif" alt="Gif of our predicted trajectory" />
+                <p class="PageImageText"> Nice, look at that trajectory</p>
+            </div>
+
+            <p class="PageText">
+                Cool, and with that we have our trajectory calculations taken care of. From here we could go a lot of different directions. We could add calculations to
+                take into account other forces like drag or friction, we coud add bounce prediction. None of this would be <em>that</em> hard to add,
+                we would just need to account for these extra variables in our equations.
+            </p>
+
+            <p class="PageText">
+                The thing is though, we can really only do this if <em>we</em> handle all of the
+                physics. We would have to write all the code for how collisions are handled. Not impossible, but not really the point of this blog post.
+                The reason for this is that Unity&rsquo;s physics code is complex, and even if we could accurately predict how it would react we might get
+                rounding errors and such that still leave us with the wrong calculations.
+            </p>
+
+            <p class="PageText">
+                I will leave writing your own collision handling as an exercise for the reader. If you want help,
+                <a href="https://feralpug.github.io/OtherPages/Support/Support.html" title="Link to contact page" target="_blank">contact me</a>
+                and I might write a post about how we could do that. Instead I think it will be more fun to add some decals to where our projectile will collide and
+                then wrap up this post by showing how we can simulate Unity&rsquo;s physics engine to calculate more complex trajectories.
+            </p>
+
+            <p class="PageText">
+                You can grab all of the code up to this point here.
+            </p>
+
+            <h2 class="Section" id="Part4">Part 4: Decals And Particle Systems</h2>
+
+            <p class="PageText">
+                To add decals to where our projectile collides with other objects we will use particle systems. If we add a particle system to our launcher object
+            </p>
+
+            <!-- these are here just so I can grab the right formatting as we write
+
+                            <h2 class="Section" id="Part5">Part 5: Clouds</h2>
+
+                            <div class="PageImageContainer">
+                                <img class="PageImage" src="Media/ExtendingSkyboxCapture.png" alt="Image of the final Result" />
+                                <p class="PageImageText"> An example of what you can do with procedural skyboxes</p>
+                            </div>
+
+                            <div class="PageImageContainer">
+                            <div class="ImageSideBySideContainer">
+                                <img class="PageSideBySide" src="Media/StarBending0.png" alt="Picture of our projected texture" />
+                                <img class="PageSideBySide" src="Media/StarBending1.png" alt="Picture of our projected texture" />
+                            </div>
+                            <p class="PageImageText">
+                                On the left _StarsBending is set to 0 and on the right _StarsBending is set to 1
+                            </p>
+                            </div>
+
+                            <p class="PageText">
+                            </p>
+
+            <div class="CodeHighlight">
+            <pre>
+            <code class="language-hlsl"></code>
+            </pre>
+            </div>
+
+                    <div class="CodeHighlight">
+    <pre>
+    <code class="language-csharp"></code>
+    </pre>
+    </div>
+
+
+                                    https://www.freeformatter.com/html-escape.html#ad-output
+            https://prismjs.com/index.html
+                    <div class="CodeHighlight">
+        <pre>
+        <code class="language-hlsl line-numbers">
+            Code Here
+                        <span class="addition">Addition</span>
+                        <span class="deletion"><span class="addition">Deleation</span></span>
+        }</code>
+        </pre>
+                        <p class="PageImageText">
+                            Figure Legend
+                        </p>
+                    </div>
+                    -->
+
+            <h2 class="Section" id="Part6">Part 6: Wrap up</h2>
+
+            <p class="PageText">
+                If you have any comments or something did not work for you, contact me via my
+                <a href="https://feralpug.github.io/OtherPages/Support/Support.html" title="link to support page" target="_blank">support page</a>
+                or DM me on twitter <a href="https://twitter.com/Feral_Pug" title="Link to my twitter page" target="_blank">@Feral_Pug</a>
+                and I should respond to you soon. If you want to support me you can donate at
+                <a href="https://ko-fi.com/feral_pug" title="Link to my Ko-fi page" target="_blank">ko-fi.com/feral_pug</a>.
+            </p>
+        </article>
+
+        <div class="AsideContainer">
+            <aside>
+                <h2>Table of Contents</h2>
+                <ul>
+                    <li>
+                        <a href="#PostStart" title="Jump to start of post">
+                            Start
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part1" title="Jump to part one">
+                            Part 1: Setup
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part2" title="Jump to part two">
+                            Part 2: Trajectory Math
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part3" title="Jump to part three">
+                            Part 3: Writing Code
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part4" title="Jump to part four">
+                            Part 4: Adding Decals
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part5" title="Jump to part five">
+                            Part 5: Clouds
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#Part6" title="Jump to part six">
+                            Part 6: Wrap up
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>
+            All resources found here are to be used freely for any projects, commercial, personal, or otherwise.
+        </p>
+    </footer>
+</body>
+</html>
