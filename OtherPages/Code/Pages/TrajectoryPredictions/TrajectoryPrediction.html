@@ -630,7 +630,7 @@ public class TrajectoryDrawer : MonoBehaviour
 
     Vector3[] points;
 
-                <span class="addition">bool isDirty;
+    <span class="addition">bool isDirty;
 
     public void SetDirty()
     {
@@ -645,10 +645,12 @@ public class TrajectoryDrawer : MonoBehaviour
 
     private void Update()
     {
-                <span class="addition">if (isDirty)
+        <span class="addition">if (isDirty)
         {</span>
             CalculateTrajectoryPath();
-                <span class="addition">}</span>
+
+            isDirty = false;
+        <span class="addition">}</span>
     }
 
     void CalculateTrajectoryPath()
@@ -674,7 +676,7 @@ public class TrajectoryDrawer : MonoBehaviour
 {
     public Vector2 rotSpeed;
 
-                <span class="addition">TrajectoryDrawer trajectoryDrawer;
+    <span class="addition">TrajectoryDrawer trajectoryDrawer;
 
     private void Awake()
     {
@@ -695,7 +697,7 @@ public class TrajectoryDrawer : MonoBehaviour
         desRot.x = Input.GetAxis("Vertical") * rotSpeed.x;
         desRot.y = Input.GetAxis("Horizontal") * rotSpeed.y;
      
-                <span class="addition">if(desRot != Vector3.zero && trajectoryDrawer != null)
+        <span class="addition">if(desRot != Vector3.zero && trajectoryDrawer != null)
         {
             trajectoryDrawer.SetDirty();
         }</span>
@@ -737,67 +739,886 @@ public class TrajectoryDrawer : MonoBehaviour
             </p>
 
             <p class="PageText">
-                You can grab all of the code up to this point here.
+                You can grab all of the code up to this point
+                <a href="https://github.com/FeralPug/TrajectoryPredictions/tree/main/Part3:%20Writing%20Code" title="Link to part 3 code" target="_blank">here</a>.
             </p>
 
             <h2 class="Section" id="Part4">Part 4: Decals And Particle Systems</h2>
 
             <p class="PageText">
-                To add decals to where our projectile collides with other objects we will use particle systems. If we add a particle system to our launcher object
+                To add decals to where our projectile collides with other objects we will use particle systems. If we add a particle system to our launcher object we can
+                write a script that controls the particle system from code. All we have to do is figure out where to put the particles and how to orientate them. Before
+                we set up our particle system lets handle that first problem, where to put the particles.
+            </p>
+
+            <p class="PageText">
+                Currently our trajectory calculation has no idea of when it is
+                going to hit something, except for the floor value we define. But if there is an obstacle in the way we should account for that. To do this handle this, when
+                we loop through our position equations to get the points of our trajectory, we can just <code>RayCast</code> from one point to the next, stopping and storing
+                the position of where ever we hit something.
+            </p>
+
+            <p class="PageText">
+                To do this we will add a method to our <code>TrajectoryCalculator</code> class that will take in three parameters: the point we are rayCasting from, the point
+                we are rayCasting to, and a layerMask that will mask out our launcher object, because otherwise it would think we are going to hit the launcher. This method is
+                pretty straight forward. We first get a vector going from out first point to our second point, calculate the distance, and then calculate the direction that this
+                new vector is pointing in. Then we do the rayCast and return the <code>RayCastHit</code> generated from the rayCast.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">static RaycastHit FindCollisionPoint(Vector3 from, Vector3 to, LayerMask collisionMask)
+{
+    RaycastHit hit;
+    Vector3 vector = to - from;
+    float distance = vector.magnitude;
+    Vector3 direction = vector / distance;
+
+    Physics.Raycast(from, direction, out hit, distance, collisionMask);
+
+    return hit;
+}</code>
+</pre>
+                <p class="PageImageText">
+                    Add this method to our <code>TrajectoryCalculator</code> class.
+                </p>
+            </div>
+
+            <p class="PageText">
+                Then in our <code>GetTrajectoryPoints</code> method we just have to call this function when appropriate, and if we hit something use that hit point instead of
+                the point we calculated. We need to add a layerMask parameter to this function because we need it for our rayCast.
+                If we hit something we can return early because the rest of our trajectory doesn&rsquo;t matter. We then also resize
+                the array of points because otherwise we will have a lot of <code>Vector3.zero</code> and our line will be all wrong. If we don&rsquo;t hit something we just do
+                as normal.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp"><span class="addition">Vector3 point = new Vector3(xPos, yPos, zPos);</span>
+
+if(i > 0)
+{
+    RaycastHit hit = FindCollisionPoint(points[i - 1], point, collisionMask);
+
+    if (hit.collider)
+    {
+        points[i] = hit.point;
+        System.Array.Resize(ref points, i + 1);
+        return;
+    }
+    else
+    {
+        points[i] = point;
+    }
+}
+else
+{
+    points[i] = point;
+}                     </code>
+</pre>
+                <p class="PageImageText">
+                    Add everything after the highlighted portion inside of thr for loop in our <code>GetTrajectoryPoints</code> method in our <code>TrajectoryCalculator</code>
+                    class.
+                </p>
+            </div>
+
+            <p class="PageText">
+                The last thing we need to change our <code>TrajectoryDrawer</code> class to have a layerMask field that we can set. I set mine to everything except the player
+                and the projectile layers, because those are the ones we are not concerned with. Then we just add that to the call to <code>GetTrajectoryPoints</code> and we
+                are all set to go.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class TrajectoryDrawer : MonoBehaviour
+{
+    public TrajectoryDrawingSettings drawSettings;
+
+    [System.Serializable]
+    public struct TrajectoryDrawingSettings
+    {
+        public int resolution;
+        public float floor;
+        <span class="addition">public LayerMask collisionMask;</span>
+    }
+
+    ...
+
+    void CalculateTrajectoryPath()
+    {
+        TrajectoryInfo trajectoryInfo = TrajectoryCalculator.GetTragectoryInfo(transform, launchController.launchVelocity, transform.position.y, drawSettings.floor);
+
+        if (trajectoryInfo.TimeToFloor >= 0)
+        {
+            TrajectoryCalculator.GetTrajectoryPoints(trajectoryInfo, drawSettings.resolution, out points<span class="addition">, drawSettings.collisionMask</span>);
+        }
+
+        lineRenderer.positionCount = points.Length;
+        lineRenderer.SetPositions(points);
+    }</code>
+</pre>
+                <p class="PageImageText">
+                    Add the highlighted changes to our <code>TrajectoryDrawer</code> class and make sure to set it correctly in the inspector.
+                </p>
+            </div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/CollisionDetection.gif" alt="Proper collision detection for our trajectory" />
+                <p class="PageImageText"> Now we know where we are going to hit something</p>
+            </div>
+
+            <p class="PageText">
+                Now to set this up with decals we first will setup the particle system that we are going to use for drawing the decals. Lets first make the material that we will
+                be using to draw our decals with. Create a new material and set the shader to Particle > StandardUnlit. Set the Rendering Mode to Fade and the Color Mode to
+                multiply. Then import the below target texture, set the alpha is transparency check box in the import settings and assign this texture to be the Albedo texture
+                of our material.
+            </p>
+
+            <div class="PageImageContainer">
+                <div class="ImageSideBySideContainer">
+                    <img class="PageSideBySide" src="Media/Target.png" alt="Target texture used for particle" />
+                    <img class="PageSideBySide" src="Media/MaterialSettings.png" alt="Material Settings" />
+                </div>
+                <p class="PageImageText">
+                    On the left the target texture to use on the material and the material settings on the right
+                </p>
+            </div>
+
+            <p class="PageText">
+                Now add an empty gameObject to our launcher and name it something about particle systems.
+                Add a Particle System and turn off all of the modules except for the Renderer module at the bottom. In the Renderer
+                Module set the render Alignment to World and the material to be the material we just created. Also in the main Module set the <code>PlayOnAway</code> off.
+            </p>
+
+            <div class="PageImageContainer">
+                <div class="ImageSideBySideContainer">
+                    <img class="PageSideBySide" src="Media/MainModule.png" alt="Main Module Setting" />
+                    <img class="PageSideBySide" src="Media/RendererModule.png" alt="Renderer Module Settings" />
+                </div>
+                <p class="PageImageText">
+                    On the left is the Main Module settings and on the right is the Renderer Module Settings
+                </p>
+            </div>
+
+            <p class="PageText">
+                Create a <code>ParticleSystemController</code> script and attach it to our new particle system object. To use the particle system to draw decals we will set the
+                properties of the particles in our system from code when ever we have a collision. To do this we will need to be able to set some values on each particle in the
+                system. This will require us to keep two arrays one for the particles in the system and one for the data that we want to set on each particle. We will define this
+                data in a new struct.
+            </p>
+
+            <p class="PageText">
+                Create a new script and call it <code>ParticleData</code> and change it to a struct. This struct will keep track of 2 properties, the
+                position of the particle, and the rotation of the particle. Particles in Unity use Euler angles for their rotation so we will store the rotation as a Vector3
+                instead of a Quaternion.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public struct ParticleData
+{
+    public Vector3 position;
+    public Vector3 rotation;
+}</code>
+</pre>
+                <p class="PageImageText">
+                    Our Particle Data struct.
+                </p>
+            </div>
+
+            <p class="PageText">
+                Then in our <code>ParticleSystemController</code> script we will add fields for our <code>Particle[]</code>, our <code>ParticleData[]</code>, our
+                <code>ParticleSystem</code>, a settings Struct, and an int to keep track of which particle was last set. We will grab all the required references and setup
+                everything in the awake method.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">[RequireComponent(typeof(ParticleSystem))]
+public class ParticleSystemController : MonoBehaviour
+{
+    public ParticleSystemSettings systemSettings;
+
+    [System.Serializable]
+    public struct ParticleSystemSettings
+    {
+        public int maxParticles;
+        public float particleSize;
+    }
+
+    ParticleSystem _particleSystem;
+
+    ParticleSystem.Particle[] particles;
+    ParticleData[] particleData;
+
+    int lastSetParticleDataIndex = -1;
+
+    private void Awake()
+    {
+        _particleSystem = GetComponent&#60ParticleSystem&#62();
+        ResetParticleSystem();
+    }
+
+    void ResetParticleSystem()
+    {
+        particles = new ParticleSystem.Particle[systemSettings.maxParticles];
+        particleData = new ParticleData[systemSettings.maxParticles];
+
+        for (int i = 0; i < particleData.Length; i++)
+        {
+            particleData[i] = new ParticleData();
+        }
+
+        _particleSystem.Clear();
+    }
+}</code>
+</pre>
+                <p class="PageImageText">
+                    The basic setup of our <code>ParticleSystem</code> controller
+                </p>
+            </div>
+
+            <p class="PageText">
+                The rest of our <code>ParticleSystemController</code> will consist of three methods. We will have a <code>SetParticle</code> method, a <code>ClearParticles</code>
+                method, and a <code>DisplayParticles</code> method. Our <code>TrajectoryDrawer</code> will, if a collision is found, clear out the particle system, set the
+                desired particle, and then display the particles.
+            </p>
+
+            <p class="PageText">
+                The <code>ClearParticles</code> method will just loop through the two arrays setting a few properties to effectivly turn of the particles. We only have to do
+                this up to the last set index because <code>Particle</code> is a struct that has default values of an invisible particle. So any particles we haven&rsquo;t touched
+                will just be invisible. Then we set the lastSetIndex to be -1.
+            </p>
+            <p class="PageText">
+                The <code>SetParticle</code> method will get the data from the RayCastHit and set the data accordingly on the next index to set. The only thing to note here is that
+                we have to flip the z of the collision normal or our particle will be backwards.
+                The <code>DisplayParticles</code> method will just loop up to the lastSetIndex and read the data out of the <code>ParticleData[]</code> and set it on the appropriate
+                particle. Add the following methods to our <code>ParticleSystemController</code>.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public void SetParticle(RaycastHit collisionData)
+{
+    int index = lastSetParticleDataIndex + 1;
+
+    if(index < systemSettings.maxParticles)
+    {
+        ParticleData particle = new ParticleData();
+
+        particle.position = collisionData.point + collisionData.normal * 0.01f;
+        Vector3 normal = collisionData.normal;
+        normal.z *= -1;
+        particle.rotation = Quaternion.LookRotation(normal).eulerAngles;
+        particleData[index] = particle;
+
+        lastSetParticleDataIndex = index;
+    }
+}
+
+public void ClearParticles()
+{
+    for (int i = 0; i <= lastSetParticleDataIndex; i++)
+    {
+        particles[i].startColor = Color.clear;
+    }
+
+    lastSetParticleDataIndex = -1;
+}
+
+public void DisplayParticles()
+{
+    for (int i = 0; i <= lastSetParticleDataIndex; i++)
+    {
+        particles[i].position = particleData[i].position;
+        particles[i].rotation3D = particleData[i].rotation;
+        particles[i].startSize = systemSettings.particleSize;
+        particles[i].startColor = Color.white;
+    }
+
+    _particleSystem.SetParticles(particles, particles.Length);
+}</code>
+</pre>
+            </div>
+
+            <p class="PageText">
+                But in order to do this our drawer needs to know about the collision that occured. We will have to change our
+                <code>GetTrajectoryPoints</code> method in our <code>TrajectoryCalculator</code> to give us the RaycastHit variable when it finds a collision. If it doesn&rsquo;t
+                find a collision we will just manually set the position and orientation of the RayCastHit at the end of the method.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public static void GetTrajectoryPoints(TrajectoryInfo trajectoryInfo, int resolution,
+    out Vector3[] points<span class="addition">, out RaycastHit raycastHit</span>, LayerMask collisionMask)
+{
+    <span class="addition">raycastHit = new RaycastHit();</span>
+
+    //calculate the time between points on our trajectory
+    float timeStep = trajectoryInfo.TimeToFloor / resolution;
+
+...
+
+            if(i > 0)
+            {
+                <span class="addition">raycastHit</span> = FindCollisionPoint(points[i - 1], point, collisionMask);
+
+                if (raycastHit.collider)
+                {
+                    points[i] = <span class="addition">raycastHit</span>.point;
+                    System.Array.Resize(ref points, i + 1);
+                    return;
+                }
+                else
+                {
+                    points[i] = point;
+                }
+            }
+            else
+            {
+                points[i] = point;
+            }                     
+        }
+
+    <span class="addition">raycastHit.point = points[points.Length - 1];
+    raycastHit.normal = Vector3.up;</span>
+}
+</code>
+</pre>
+                <p class="PageImageText">
+                    Make the highlighted changes
+                </p>
+            </div>
+
+            <p class="PageText">
+                Now back in our drawer we just have to declare a public <code>ParticleSystemController</code>, assign it in the inspector, and then
+                tell the praticle system to draw at the new position. Dont forget to set a max particles number and size to our <code>ParticleSystemController</code>. I
+                am using 100 and 2.5 for the size.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">public class TrajectoryDrawer : MonoBehaviour
+{
+    <span class="addition">public ParticleSystemController particleSystemController;</span>
+
+    public TrajectoryDrawingSettings drawSettings;
+
+    [System.Serializable]
+    public struct TrajectoryDrawingSettings
+    {
+        public int resolution;
+        public float floor;
+        public LayerMask collisionMask;
+    }
+
+...
+
+    void CalculateTrajectoryPath()
+    {
+        TrajectoryInfo trajectoryInfo = TrajectoryCalculator.GetTragectoryInfo(transform, launchController.launchVelocity, transform.position.y, drawSettings.floor);
+
+        if (trajectoryInfo.TimeToFloor >= 0)
+        {
+            TrajectoryCalculator.GetTrajectoryPoints(trajectoryInfo, drawSettings.resolution, out points, <span class="addition">out RaycastHit hit,</span> drawSettings.collisionMask);
+
+            <span class="addition">particleSystemController.ClearParticles();
+            particleSystemController.SetParticle(hit);
+            particleSystemController.DisplayParticles();</span>
+        }
+
+        lineRenderer.positionCount = points.Length;
+        lineRenderer.SetPositions(points);
+    }</code>
+</pre>
+
+                <p class="PageImageText">
+                    Make the highlighted changes to our <code>TrajectoryDrawer</code>
+                </p>
+            </div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/TrajectoryWithTarget.gif" alt="Our trajectory with target decal" />
+                <p class="PageImageText"> Target locked, Captain. Fire!!!</p>
+            </div>
+
+            <p class="PageText">
+                And with that we have our decals! In the next and final section we will use Unity&rsquo;s Physics system to simulate the trajectory really quickly so that we
+                can simply add complex trajectories to our trajectory prediction. Along with that we will setup the decals to be drawn at every collision point.
+            </p>
+
+            <p class="PageText">
+                Ass always you can grab the the files up to this point
+                <a href="https://github.com/FeralPug/TrajectoryPredictions/tree/main/Part4:%20Decals" title="Link to github" target="_blank">here</a>
+            </p>
+
+            <h2 class="Section" id="Part5">Part 5: Physics Simulations</h2>
+
+            <p class="PageText">
+                To handle complex trajectories we will use the physics engine in Unity to find the points along our trajectory. Unity allows us to create a copy of the physics
+                scene used to simulate physics in a game. We can use this to get a copy of a physics scene that is a replica of our current scene. Then we can apply the force
+                to our projectile and step through the physics in our replica scene, recording where our projectile goes along the way. The only caveat with this is that
+                it isn&rsquo;t cheap.
+            </p>
+
+            <p class="PageText">
+                Physics in a game can be a very resource heavy process. And trying to simulate a whole bunch of it in a single frame is not going to help frame rate. It would
+                be nice if we could multi-thread the simulation or at least move it off of the main thread but sadly we cannot, physics calls have to come from the main thread.
+                If you want buttery smooth 60 fps and complex trajectory prediction, you really need a top tier machine, or start writing your own physics.
+            </p>
+
+            <p class="PageText">
+                With that being said though, it is a cool feature Unity exposes to us and we can combine our first approach, and some coroutines, to keep our frame rate up,
+                while still giving the player a good idea of where they are aiming. When the physics simulation catches up we can switch out our points for the new simulated
+                points and show our complete trajectory.
+            </p>
+
+            <p class="PageText">
+                To start we will simply get the basic simulation running, then we will run it as a coroutine, yielding after some amount of time to let the main thread continue,
+                and then we will combine it with our particle system and trajectory calculations.
+            </p>
+
+            <p class="PageText">
+                We first will go into our <code>TrajectoryDrawer</code> and add a struct that will hold all of the data used for the simulation. Then in <code>Awake</code>
+                We are going to create a new scene passing in a <code>CreateSceneParameter</code> struct. This will prevent the new scene from auto updating the physics, which
+                is what allows us to control the physics of this new system. Then we grab all the physics objects in the main scene and duplicate them passing them over to the
+                new scene. We just have to make sure we make everything invisible so we are not seeing double. Make the highlighted changes.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+<span class="addition">using UnityEngine.SceneManagement;</span>
+
+[RequireComponent(typeof(LineRenderer), typeof(LaunchController))]
+public class TrajectoryDrawer : MonoBehaviour
+{
+    public ParticleSystemController particleSystemController;
+
+    public TrajectoryDrawingSettings drawSettings;
+
+    public SimulationSettings simulationSettings;
+
+    [System.Serializable]
+    public struct TrajectoryDrawingSettings
+    {
+        public int resolution;
+        public float floor;
+        public LayerMask collisionMask;
+        <span class="addition">public bool simulate;</span>
+    }
+
+    <span class="addition">[System.Serializable]
+    public struct SimulationSettings
+    {
+        public float simulationTime;
+    }
+
+    struct SimulationData
+    {
+        public Scene simulatedScene;
+        public PhysicsScene physicsScene;
+        public ProjectileController simulatedProjectile;
+        public GameObject[] colliders;
+    }
+
+    SimulationData simulationData;</span>
+
+...
+</code>
+</pre>
+                <p class="PageImageText">
+                    Adding the structs that will control our simulation. Make sure to add the using directive at the top to allow us to use the <code>SceneManagment</code> API.
+                </p>
+            </div>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">private void Awake()
+{
+    lineRenderer = GetComponent&#60LineRenderer&#62();
+    launchController = GetComponent&#60LaunchController&#62();
+
+
+    <span class="addition">if (drawSettings.simulate)
+    {
+        SetupSimulationData();
+    }</span>
+}
+
+void SetupSimulationData()
+{
+    simulationData = new SimulationData();
+
+    CreateSceneParameters createSceneParameters = new CreateSceneParameters(LocalPhysicsMode.Physics3D);
+    simulationData.simulatedScene = SceneManager.CreateScene("Simulation Scene", createSceneParameters);
+    simulationData.physicsScene = simulationData.simulatedScene.GetPhysicsScene();
+    GetColliders();
+    SetupSimulationScene();
+}
+
+void GetColliders()
+{
+    Collider[] colliders = FindObjectsOfType&#60Collider>();
+    List&#60GameObject&#62 colliderRoots = new List&#60GameObject&#62();
+
+    for(int i = 0; i < colliders.Length; i++)
+    {
+        GameObject go = colliders[i].transform.root.gameObject;
+        if (!colliderRoots.Contains(go) && go.layer != LayerMask.NameToLayer("Player"))
+        {
+            colliderRoots.Add(go);
+        }
+    }
+
+    simulationData.colliders = new GameObject[colliderRoots.Count];
+
+    for (int i = 0; i < simulationData.colliders.Length; i++)
+    {
+        simulationData.colliders[i] = Instantiate(colliderRoots[i]);
+        simulationData.colliders[i].layer = LayerMask.NameToLayer("Invisible");
+    }
+
+    simulationData.simulatedProjectile = Instantiate(launchController.projectilePrefab);
+    simulationData.simulatedProjectile.gameObject.layer = LayerMask.NameToLayer("Invisible");
+}
+
+void SetupSimulationScene()
+{
+    SceneManager.MoveGameObjectToScene(simulationData.simulatedProjectile.gameObject, simulationData.simulatedScene);
+
+    foreach (GameObject go in simulationData.colliders)
+    {
+        SceneManager.MoveGameObjectToScene(go, simulationData.simulatedScene);
+    }
+}
+</code>
+</pre>
+                <p class="PageImageText">
+                    Make the highlighted change to awake to only set up the simulation when needed and then add the other methods
+                </p>
+            </div>
+
+            <p class="PageText">
+                You may have noticed that the way I make the objects invisible is by putting them in an <code>Invisible</code> layer. This means we have to add the Invisible
+                layer to our project, told you I would get back to that. Then change our camera to not see the Invisible layer by unchecking it in the <code>CullingMask</code>
+                property. Also, set the Invisible layer to only interact with its self in the physics settings. We do not want things running into invisible objects in
+                the main scene. I also do not add the player because it should not collide with our projectile anyway. Also, you could tag objects that you want in the simulation,
+                and grab objects with tags, but this is less work up front and it is happening in <code>Awake</code> anyway, so it will not hurt our performance when it matters.
+            </p>
+
+            <p class="PageText">
+                Now to get this actually working. If we are using our simulation we will call a new <code>SimulateTrajectory</code> method instead of our
+                <code>CalculateTrajectoryPath</code> method. It will work by first reseting our projectile and our lineRenderer. We set the launch velocity on the projectile.
+                Then we calculate how much time needs to pass before we record a point. We enter into a loop that will terminate when we have completed our simulation.
+            </p>
+
+            <p class="PageText">
+                The magic happens with the <code>Simulate</code> method. We pass in the amount of time to simulate and then the physics system updates that amount of time,
+                which will move our projectile. All we have to do is record its position when necessary. You may think we can increase the time step to increase the performance,
+                which is true up to a point. Too high of values will cause erratic behavior, so you can adjust it but be careful. The default is 0.02f BTW. I also add a check
+                just to make sure we don&rsquo;t go outside of the bounds of our array.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">private void Update()
+{
+    if (isDirty)
+    {
+        isDirty = false;
+
+        <span class="addition">if (drawSettings.simulate)
+        {
+            SimulateTrajectory();
+        }
+        else
+        {</span>
+            CalculateTrajectoryPath();
+        <span class="addition">}</span>
+    }
+}
+
+...
+
+void SimulateTrajectory()
+{
+    lineRenderer.positionCount = 0;
+
+    //reset projectile and fire simulated projectile
+    Rigidbody simBody = simulationData.simulatedProjectile.Rigidbody;
+    simBody.position = launchController.transform.position;
+    simBody.rotation = Quaternion.identity;
+    simBody.angularVelocity = Vector3.zero;
+    simBody.velocity = TrajectoryCalculator.GetLaunchDirection(launchController.transform) * launchController.launchVelocity;
+
+    float timeStepToPoint = simulationSettings.simulationTime / drawSettings.resolution;
+    points = new Vector3[drawSettings.resolution];
+    int currentIndex = 0;
+
+    for (float t = 0f; t < simulationSettings.simulationTime; t += Time.fixedDeltaTime)
+    {
+        if (currentIndex >= points.Length || isDirty)
+        {
+            break;
+        }
+
+        if (t >= timeStepToPoint * currentIndex)
+        {
+            lineRenderer.positionCount += 1;
+            lineRenderer.SetPosition(currentIndex, simBody.position);
+
+            points[currentIndex] = simBody.position;
+            currentIndex++;
+        }
+
+        simulationData.physicsScene.Simulate(Time.fixedDeltaTime);
+    }
+}
+</code>
+</pre>
+            </div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/FirstComplexTrajectory.gif" alt="Gif of physics simulation" />
+                <p class="PageImageText"> Our simulation in action</p>
+            </div>
+
+            <p class="PageText">
+                Now to get this running as a coroutine we just need to set an amount of time that the simulation is allowed to run before taking a break. We call the method,
+                with the <code>StartCoroutine</code> method and make sure to stop any currently running coroutines before we start a new one. Make the following changes.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">
+[System.Serializable]
+public struct SimulationSettings
+{
+    public float simulationTime;
+    <span class="addition">[Range(0.0f, 0.1f)]
+    public float simulationSpeed;</span>
+}
+
+...
+
+private void Update()
+{
+    if (isDirty)
+    {
+        isDirty = false;
+
+        if (drawSettings.simulate)
+        {
+            <span class="addition">StopAllCoroutines();
+            StartCoroutine(</span>SimulateTrajectory()<span class="addition">)</span>;
+        }
+        else
+        {
+            CalculateTrajectoryPath();
+        }
+    }
+}
+
+...
+
+<span class="addition">IEnumerator</span> SimulateTrajectory()
+{
+    lineRenderer.positionCount = 0;
+
+    //reset projectile and fire simulated projectile
+    Rigidbody simBody = simulationData.simulatedProjectile.Rigidbody;
+    simBody.position = launchController.transform.position;
+    simBody.rotation = Quaternion.identity;
+    simBody.angularVelocity = Vector3.zero;
+    simBody.velocity = TrajectoryCalculator.GetLaunchDirection(launchController.transform) * launchController.launchVelocity;
+
+    float timeStepToPoint = simulationSettings.simulationTime / drawSettings.resolution;
+    points = new Vector3[drawSettings.resolution];
+    int currentIndex = 0;
+
+    <span class=" addition">float startTime = Time.realtimeSinceStartup;</span>
+
+    for (float t = 0f; t < simulationSettings.simulationTime; t += Time.fixedDeltaTime)
+    {
+        if (currentIndex >= points.Length || isDirty)
+        {
+            break;
+        }
+
+        if (t >= timeStepToPoint * currentIndex)
+        {
+            lineRenderer.positionCount += 1;
+            lineRenderer.SetPosition(currentIndex, simBody.position);
+
+            points[currentIndex] = simBody.position;
+            currentIndex++;
+        }
+
+        simulationData.physicsScene.Simulate(Time.fixedDeltaTime);
+
+        <span class="addition">if (Time.realtimeSinceStartup - startTime >= simulationSettings.simulationSpeed)
+        {
+            yield return null;
+
+            startTime = Time.realtimeSinceStartup;
+        }</span>
+    }
+}
+</code>
+</pre>
+
+                <p class="PageImageText">
+                    Those changes should save your frame rate. I set my simulationSpeed to 0.005f
+                </p>
+            </div>
+
+            <p class="PageText">
+                Now all that is left to do is to hook this up with our particle system and we are good to go. Because of how we set up the code for our particle system all
+                we have to do is reset the particle system and call <code>SetParticle</code> for every place we detect a collision and then
+                we call <code>DisplayParticles</code> to draw the particles to our scene. To find our particle&rsquo;s position we will use a RayCast just like before,
+                except that we will always record the last position of the projectile as we go through our simulation, so that we can get a direction for our RayCast.
+            </p>
+
+            <div class="CodeHighlight">
+<pre>
+<code class="language-csharp">IEnumerator SimulateTrajectory()
+{
+    lineRenderer.positionCount = 0;
+    <span class="addition">particleSystemController.ClearParticles();
+    particleSystemController.DisplayParticles();</span>
+
+    //reset projectile and fire simulated projectile
+    Rigidbody simBody = simulationData.simulatedProjectile.Rigidbody;
+    simBody.position = launchController.transform.position;
+    simBody.rotation = Quaternion.identity;
+    simBody.angularVelocity = Vector3.zero;
+    simBody.velocity = TrajectoryCalculator.GetLaunchDirection(launchController.transform) * launchController.launchVelocity;
+
+    float timeStepToPoint = simulationSettings.simulationTime / drawSettings.resolution;
+    points = new Vector3[drawSettings.resolution];
+    int currentIndex = 0;
+
+    float startTime = Time.realtimeSinceStartup;
+
+    <span class="addition">Vector3 lastPos = simBody.position;</span>
+
+    for (float t = 0f; t < simulationSettings.simulationTime; t += Time.fixedDeltaTime)
+    {
+        if (currentIndex >= points.Length || isDirty)
+        {
+            break;
+        }
+
+        if (t >= timeStepToPoint * currentIndex)
+        {
+            lineRenderer.positionCount += 1;
+            lineRenderer.SetPosition(currentIndex, simBody.position);
+
+            points[currentIndex] = simBody.position;
+            currentIndex++;
+        }
+
+        simulationData.physicsScene.Simulate(Time.fixedDeltaTime);
+           
+        <span class="addition">Vector3 dir = (simBody.position - lastPos).normalized;
+        if(Physics.Raycast(simBody.position, dir, out RaycastHit hit, 1f, drawSettings.collisionMask))
+        {
+            particleSystemController.SetParticle(hit);  
+            particleSystemController.DisplayParticles();
+        }</span>
+
+        lastPos = simBody.position;
+
+        if (Time.realtimeSinceStartup - startTime >= simulationSettings.simulationSpeed)
+        {
+            yield return null;
+
+            startTime = Time.realtimeSinceStartup;
+        }
+    }
+}</code>
+</pre>
+                <p class="PageImageText">
+                    Make the above highlighted changes to our <code>SimulateTrajectory</code> method
+                </p>
+            </div>
+
+            <div class="PageImageContainer">
+                <img class="PageImage" src="Media/ComplexWithTargets.gif" alt="Gif of the final Result" />
+                <p class="PageImageText">
+                    And with that we can show multiple decals for our trajectory. I added a bouncy physics material to
+                    our projectile
+                </p>
+            </div>
+
+            <p class="PageText">
+                You can grab the final code 
+                <a href="https://github.com/FeralPug/TrajectoryPredictions/tree/main/Part5:%20Physics%20Sim" title="Link to Github" target="_blank">here</a>.
             </p>
 
             <!-- these are here just so I can grab the right formatting as we write
 
-                            <h2 class="Section" id="Part5">Part 5: Clouds</h2>
+                                <h2 class="Section" id="Part5">Part 5: Clouds</h2>
 
-                            <div class="PageImageContainer">
-                                <img class="PageImage" src="Media/ExtendingSkyboxCapture.png" alt="Image of the final Result" />
-                                <p class="PageImageText"> An example of what you can do with procedural skyboxes</p>
-                            </div>
+                                <div class="PageImageContainer">
+                                    <img class="PageImage" src="Media/ExtendingSkyboxCapture.png" alt="Image of the final Result" />
+                                    <p class="PageImageText"> An example of what you can do with procedural skyboxes</p>
+                                </div>
 
-                            <div class="PageImageContainer">
-                            <div class="ImageSideBySideContainer">
-                                <img class="PageSideBySide" src="Media/StarBending0.png" alt="Picture of our projected texture" />
-                                <img class="PageSideBySide" src="Media/StarBending1.png" alt="Picture of our projected texture" />
-                            </div>
-                            <p class="PageImageText">
-                                On the left _StarsBending is set to 0 and on the right _StarsBending is set to 1
-                            </p>
-                            </div>
+                                <div class="PageImageContainer">
+                                <div class="ImageSideBySideContainer">
+                                    <img class="PageSideBySide" src="Media/StarBending0.png" alt="Picture of our projected texture" />
+                                    <img class="PageSideBySide" src="Media/StarBending1.png" alt="Picture of our projected texture" />
+                                </div>
+                                <p class="PageImageText">
+                                    On the left _StarsBending is set to 0 and on the right _StarsBending is set to 1
+                                </p>
+                                </div>
 
-                            <p class="PageText">
-                            </p>
+                                <p class="PageText">
+                                </p>
 
-            <div class="CodeHighlight">
-            <pre>
-            <code class="language-hlsl"></code>
-            </pre>
-            </div>
+                <div class="CodeHighlight">
+                <pre>
+                <code class="language-hlsl"></code>
+                </pre>
+                </div>
 
-                    <div class="CodeHighlight">
+                <div class="CodeHighlight">
     <pre>
     <code class="language-csharp"></code>
     </pre>
-    </div>
+                </div>
 
 
-                                    https://www.freeformatter.com/html-escape.html#ad-output
-            https://prismjs.com/index.html
-                    <div class="CodeHighlight">
-        <pre>
-        <code class="language-hlsl line-numbers">
-            Code Here
-                        <span class="addition">Addition</span>
-                        <span class="deletion"><span class="addition">Deleation</span></span>
-        }</code>
-        </pre>
-                        <p class="PageImageText">
-                            Figure Legend
-                        </p>
-                    </div>
-                    -->
+                                        https://www.freeformatter.com/html-escape.html#ad-output
+                https://prismjs.com/index.html
+                        <div class="CodeHighlight">
+            <pre>
+            <code class="language-hlsl line-numbers">
+                Code Here
+                            <span class="addition">Addition</span>
+                            <span class="deletion"><span class="addition">Deleation</span></span>
+            }</code>
+            </pre>
+                            <p class="PageImageText">
+                                Figure Legend
+                            </p>
+                        </div>
+                        -->
 
             <h2 class="Section" id="Part6">Part 6: Wrap up</h2>
+
+            <p class="PageText">
+                Now I probably wouldn&rsquo;t use this simulation in a real game given the performance constraints on it. You would be better of handling collision yourself and
+                calculating trajectorys as we did in the first part. But if you were to use the simulation approach you could increase the accuracy of the target placement by
+                using <code>SphereCasts</code> instead of Raycasts. In any case it is fun to get the correct trajectories this way, and the ideas used for the particle system
+                could be used for all sorts of effects.
+            </p>
 
             <p class="PageText">
                 If you have any comments or something did not work for you, contact me via my
@@ -839,7 +1660,7 @@ public class TrajectoryDrawer : MonoBehaviour
                     </li>
                     <li>
                         <a href="#Part5" title="Jump to part five">
-                            Part 5: Clouds
+                            Part 5: Physics Simulation
                         </a>
                     </li>
                     <li>
