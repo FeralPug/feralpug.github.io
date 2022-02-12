@@ -1168,12 +1168,7 @@ public void DisplayParticles()
             </p>
 
             <p class="PageText">
-                With that being said though, it is a cool feature Unity exposes to us and we can combine our first approach, and some coroutines, to keep our frame rate up,
-                while still giving the player a good idea of where they are aiming. When the physics simulation catches up we can switch out our points for the new simulated
-                points and show our complete trajectory.
-            </p>
-
-            <p class="PageText">
+                With that being said though, it is a cool feature Unity exposes to us and with some coroutines we can simulate the physics over time to keep our frame rate up.
                 To start we will simply get the basic simulation running, then we will run it as a coroutine, yielding after some amount of time to let the main thread continue,
                 and then we will combine it with our particle system and trajectory calculations.
             </p>
