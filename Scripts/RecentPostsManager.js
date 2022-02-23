@@ -31,7 +31,7 @@ if (hostName !== "") {
     entry.appendChild(link);
 
     var pic = document.createElement("img");
-    pic.setAttribute("src", hostName + "Media/RecentPosts/TrajectoryThumb.png");
+    pic.setAttribute("src", hostName + "/Media/RecentPosts/TrajectoryThumb.png");
     pic.setAttribute("alt", "Screenshot of the Trajectory Predictions");
     link.appendChild(pic);
 
