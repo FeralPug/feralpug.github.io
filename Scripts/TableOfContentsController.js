@@ -93,7 +93,7 @@ let callback = (entries) => {
 
 		if (index >= 0) {
 			tableOfContents[index].style.color = "green";
-			tableOfContents[indices[0]].firstElementChild.style.color = "green";
+			tableOfContents[index].firstElementChild.style.color = "green";
         }
     }
 }
