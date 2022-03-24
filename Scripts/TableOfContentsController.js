@@ -61,13 +61,15 @@ let callback = (entries) => {
 	for (let k = 0; k < tableOfContents.length; k++) {
 		if (k != indexInView) {
 			tableOfContents[k].style.color = "blue";
-        }
+			tableOfContents[k].firstElementChild.style.color = "blue";
+        	}
 	}
 
 	if (indices.length > 0) {
 		indices = indices.sort(compareNumbers);
 
 		tableOfContents[indices[0]].style.color = "green";
+		tableOfContents[indices[0]].firstElementChild.style.color = "green";
 	}
 	else if(indexInView < 0) {
 		let distances = [];
