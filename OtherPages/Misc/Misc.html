@@ -63,7 +63,8 @@
             </h1>
 
             <p class="PageText">
-                Here is a collection of some videos showing off some random different things that I have made but were not a part of any larger project.
+                Here is a collection of some videos showing off some random different things that I have made but were not a part of any larger project. It mostly includes
+                things that are prototypes or proof of concept type things.
                 Mostly you will find demos of shaders and such that I made but 
                 do not plan to write a lengthy blog post about. You will find a short discription of the technique used for every video. 
             </p>
@@ -183,7 +184,8 @@
                     </li>
                     <li>
                         <div class="DirectoryItemImage">
-                            <iframe width="560" height="315" src="https://www.youtube.com/embed/7deWpG8zy6Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                        </div>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/7deWpG8zy6Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
                         <div class="DirectoryItemText">
                             <h3>
                                 Third Person Controller FX
@@ -192,8 +194,25 @@
                                 This video is just showing a couple of FX I made for a mock-up character controller I was working on. The first effect is a sonic boom. It works
                                 by spawning a particles and the player position as the player moves through their dash ability. The particles use billboarding to face the camera.
                                 The shader for the particles use a ring texture and a grab pass to sample the scene behind the particle. The ring texture determines offsets to use
-                                when sampling the grab pass. The particle grows over time to create the effect of the sonic boom. The video also shows a simple weapon summoning 
+                                when sampling the grab pass. The particle grows over time to create the effect of the sonic boom. The video also shows a simple weapon summoning
                                 effect. The shader for the weapon samples a noise texture to dissolve into the scene when the player wants to pull out their weapon.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/ZWxH8LenqnQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Procedural Dungeon Generation
+                            </h3>
+                            <p>
+                                This video is showing some procedural dungeon generation that I made. It works by being given parameters for what dimensions certain rooms are 
+                                allowed to be. Then it randomly starts placing rooms connecting them together as it goes until it has filled out the entire map. Then it takes 
+                                a pass placing objects in the room. Object placement uses an approach inspired by wave function collapse. Objects have constraints around 
+                                how they can fit into a room. An object is randomly chosen and it attempts to put that object in the room at a certain position. If it fails
+                                it moves to a new position and tries a new object. It does this until the room has no more places left to try. It then places enemies that patrol
+                                the rooms.
                             </p>
                         </div>
                     </li>
