@@ -8,18 +8,18 @@
     border-radius: 5px;
 }
 
-.DirectoryContainer h2 {
-    margin: 20px;
-}
+    .DirectoryContainer h2 {
+        margin: 20px;
+    }
 
-.DirectoryContainer ul {
-    list-style: none;
-    padding: 0px;
-}
+    .DirectoryContainer ul {
+        list-style: none;
+        padding: 0px;
+    }
 
-.DirectoryContainer li{
-    margin: 20px 0px;
-}
+    .DirectoryContainer li {
+        margin: 20px 0px;
+    }
 
 /*
     this is where we style the actual items
@@ -30,17 +30,17 @@
     we set the image first
 */
 
-.DirectoryItemImage{
+.DirectoryItemImage {
     display: flex;
     align-content: center;
     justify-content: space-around;
 }
 
-.DirectoryItemImage img {
-    width: 256px;
-    min-width: 128px;
-    max-width: 100%;
-}
+    .DirectoryItemImage img {
+        width: 256px;
+        min-width: 128px;
+        max-width: 100%;
+    }
 
 .DirectoryItemIcon {
     display: flex;
@@ -48,9 +48,9 @@
     justify-content: space-around;
 }
 
-.DirectoryItemIcon img {
-    width: 128px;
-}
+    .DirectoryItemIcon img {
+        width: 128px;
+    }
 
 /*
     then we set the texts
@@ -80,7 +80,6 @@
 
 .DirectoryContainer li.ContactListItem {
     display: block;
-
 }
 
 .ContactForm {
@@ -90,27 +89,27 @@
     margin-left: 5px;
 }
 
-.ContactForm h2 {
-    text-align: center;
-    margin-top: 0px;
-}
+    .ContactForm h2 {
+        text-align: center;
+        margin-top: 0px;
+    }
 
-.ContactForm label{
-    font-size: 1.6rem;
-}
+    .ContactForm label {
+        font-size: 1.6rem;
+    }
 
-.ContactForm .ContactEmailInput{
-    display: flex;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+    .ContactForm .ContactEmailInput {
+        display: flex;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 
 .ContactEmailInput input {
     flex: 3;
     width: 100%;
 }
 
-.ContactForm textarea{
+.ContactForm textarea {
     width: 98%;
     min-height: 200px;
     max-width: 98%
@@ -136,7 +135,7 @@
     /* 
         set the list items to flex so we can put the image and text next to each other instead of on top of each other
     */
-
+    /*
     .DirectoryContainer ul {
         margin: 20px;
     }
@@ -148,7 +147,7 @@
         margin: 20px;
     }
 
-    /* set the image container to block so that it doesnt justify the image content inside*/
+
     .DirectoryItemText {
         margin: 0px 20px;
     }
@@ -157,12 +156,11 @@
         display: block;
     }
 
-    /*i dont think this is used at all*/
-    .DirectoryItemIcon{
+    .DirectoryItemIcon {
         display: block;
     }
 
-    /* set the flex values*/
+
 
     .DirectoryItemImage {
         flex: 1;
@@ -176,24 +174,11 @@
         flex: 3;
     }
 
-    /* style the text*/
+
 
     .DirectoryContainer h3 {
         margin-top: 0px;
         text-align: left;
     }
-
-    /*
-        contact form
     */
-
-    .ContactForm form {
-        margin: 10px;
-    }
-
-    .ContactForm textarea {
-        width: 100%;
-        min-height: 200px;
-        max-width: 100%
-    }
 }

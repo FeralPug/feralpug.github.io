@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Feral_Pug Codes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../../StyleSheets/EveryPage/stylesGeneral.css" />
+    <link rel="stylesheet" href="../../StyleSheets/SpecificStyles/stylesRecentPosts.css" />
+    <link rel="stylesheet" href="../../StyleSheets/MiscPage/MiscStyles.css" />
+
+    <script src="../../Scripts/RecentPostsManager.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="Banner" id="Top">Feral_Pug Codes</div>
+    </header>
+
+    <div class="SocialNav">
+        <ul>
+            <li>
+                <a href="https://ko-fi.com/feral_pug" title="Link to my Ko-fi page" target="_blank">
+                    <img src="../../Media/Icons/Ko-fiLogo.png" alt="Ko-Fi Logo" width="32" />
+                </a>
+            </li>
+            <li>
+                <a href="https://twitter.com/Feral_Pug" title="Link to my twitter page" target="_blank">
+                    <img src="../../Media/Icons/twitterLogo.svg" alt="Twitter Logo" width="32" />
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="NavContainer">
+        <nav>
+            <ul>
+                <li>
+                    <a href="../../index.html">Home</a>
+                </li>
+                <li>
+                    <a href="../GamesPage/Games.html">Games</a>
+                </li>
+                <li>
+                    <a href="#Top" class="current">FVX/WIP</a>
+                </li>
+                <li>
+                    <a href="../Code/Code.html">Code Blog</a>
+                </li>
+                <li>
+                    <a href="../Tools/Tools.html">Tools</a>
+                </li>
+                <li>
+                    <a href="../Support/Support.html">Support</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <article>
+            <h1>
+                VFX/WIP
+            </h1>
+
+            <p class="PageText">
+                Here is a collection of some videos showing off some random different things that I have made but were not a part of any larger project.
+                Mostly you will find demos of shaders and such that I made but 
+                do not plan to write a lengthy blog post about. You will find a short discription of the technique used for every video. 
+            </p>
+
+            <p class="PageText">
+                I am always working on and testing new ideas so check back later to see if I have added anymore to this page.
+            </p>
+
+
+            <div class="DirectoryContainer">
+                <h2>VFX/WIP</h2>
+
+                <ul>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/Hnr5H7KVJdQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Water Shader 1: Planar Reflections
+                            </h3>
+                            <p>
+                                A water shader made in Unity. Main features are the planar reflections used to reflect the scene geometry and skybox. It is does this by rendering
+                                a second camera reflected over the water plane and settings its projection matrix so that this second cameras near plane is equal to the water plane.
+                                Then by passing this rendered image to the water shader, we can manipulate the uvs of the water shader by the normal at the fragment position to create
+                                the effect of refraction. Additionally, the shore foam uses noise textures to create more organic looking foam than by just looking in the depth buffer.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/j8PrDbRMnEA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Water Shader 2: Caustics
+                            </h3>
+                            <p>
+                                The big feature of this water shader is the procedural water caustics that are prjected on to the scene geometry. They are most easily seen on
+                                the rocks on the left side of the video. This effect was created by reconstructing the world space position of the scene geometry behind the water
+                                plane by using the depth buffer. Then we can sample a caustics texture with these world space positions being used as UV coordinates. Furthermore,
+                                we can split the colors of the caustics texture by doing three texture samples with different offsets for each color channel and then add them
+                                back together to get the prism effect of water caustics.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/0xPM94CL_go" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Water Shader 3: SDF foam lines
+                            </h3>
+                            <p>
+                                The big feature of this water shader is SDF foam lines around all of the geometry. This effect is achieved by using an orthographic camera
+                                looking down on the scene. The near plane of this camera is set equal to the water plane in the scene. We then render all objects seen by the
+                                camera with a simple shader that first renders their backfaces and then then their front faces. When rendering the back faces we write one into a
+                                render texture. When rendering the front faces we write a zero. The result of this is a render texture that has the shapes of all the objects in the
+                                scene at the height of the water plane. I then use the Jump Flood algorithm to expand the area of shapes. We then can sample this render texture
+                                in the water shader to get the SDF shapes. I also use another render texture to store the previous SDF shape, so that we can get nice water trails for
+                                moving objects.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/uEWnPQjh2Rs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Endless Procedural Clouds
+                            </h3>
+                            <p>
+                                This was an experiment with compute shaders in Unity. It works by using compute shaders to create many layers of stacked meshes on the GPU and
+                                then drawing them procedurally from that generated data. This create the illusion of volumetric clouds. The system also is also endless so as the
+                                camera moves the chucks of clouds will get discarded and generated to keep them centered over the player. The shader used for drawing uses noise
+                                maps to create the final cloud shape. I ramped up the offsets over time in the sampling of these noise maps in the above video to really show
+                                how the cloud shapes are not static and can change over time.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/1J8hGbRZJ18" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Volumtric Lighting
+                            </h3>
+                            <p>
+                                This is a post processing effect to give volumetric lighting to windows that may be in a scene. It works by using the direction of the main
+                                light in the scene to create a bounding box from the window object to the ground. This bounding box can then be used in ray interection calculations
+                                to ray march only through where the light should be projected into the scene. Then as we ray march through the bounding volume we project a vector
+                                from the point in the volume to the plane of the window and sample the texture of the window. The result of the ray marching is combined into one
+                                value and is used to color that screen pixel. We also sample shadow maps at each point in the ray marching to not add colors for positions that cannot
+                                see the light.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/LV8VFh-htqs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Custom Terrain Experiment
+                            </h3>
+                            <p>
+                                This is some video from a custom terrain editor I started building in Unity. I use command buffers to draw into splat maps that can then be
+                                sampled in the shader for the terrain to allow for lots of different textures and blending of textures. I also use compute shaders to calculate
+                                localToWorld matrices for positions on the terrain where you can draw meshes to. These meshes then get drawn procedurally to allow for thousands of
+                                detail meshes on the terrain. The second part of the video is showing off some LODing used so that we do not waste time drawing details that will
+                                not be scene by the player.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/7deWpG8zy6Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Third Person Controller FX
+                            </h3>
+                            <p>
+                                This video is just showing a couple of FX I made for a mock-up character controller I was working on. The first effect is a sonic boom. It works
+                                by spawning a particles and the player position as the player moves through their dash ability. The particles use billboarding to face the camera.
+                                The shader for the particles use a ring texture and a grab pass to sample the scene behind the particle. The ring texture determines offsets to use
+                                when sampling the grab pass. The particle grows over time to create the effect of the sonic boom. The video also shows a simple weapon summoning 
+                                effect. The shader for the weapon samples a noise texture to dissolve into the scene when the player wants to pull out their weapon.
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+
+
+            </div>
+
+        </article>
+
+        <!--This needs to exist to then grab and fill from code-->
+        <div class="AsideContainer" id="Recent">
+
+        </div>
+    </main>
+
+    <footer>
+        <p>
+            All resources found here are to be used freely for any projects, commercial, personal, or otherwise.
+        </p>
+    </footer>
+</body>
+</html>
