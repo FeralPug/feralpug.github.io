@@ -42,7 +42,59 @@ var list = document.createElement("ul");
 aside.appendChild(list);
 
 //Then make all of the elements 1 by 1
-//first li
+
+//demo
+/*
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://www.youtube.com/watch?v=s3HqWhtc0c8&ab_channel=jeffbartman");
+link.setAttribute("title", "Link to youtube video showing demo renderer");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/ScreenShotFromDemo.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the game Hyper Flight");
+link.appendChild(pic);
+
+list.appendChild(entry);
+*/
+
+//do first link
+
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://www.youtube.com/watch?v=s3HqWhtc0c8&ab_channel=jeffbartman");
+link.setAttribute("title", "Link to youtube video showing demo renderer");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/ScreenShotFromDemo.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the game Hyper Flight");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//second li
 
 var entry = document.createElement("li");
 
@@ -67,7 +119,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//make the two
+//make the three
 
 entry = document.createElement("li");
 
@@ -91,7 +143,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//make the three
+//make the four
 
 entry = document.createElement("li");
 
@@ -116,7 +168,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//make the four
+//make the five
 
 entry = document.createElement("li");
 
@@ -140,7 +192,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//make the fifth
+//make the six
 
 entry = document.createElement("li");
 
@@ -165,8 +217,9 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//make the six
+//make the seven
 
+/*
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -189,5 +242,5 @@ pic.setAttribute("alt", "Screenshot of the game Hyper Flight");
 link.appendChild(pic);
 
 list.appendChild(entry);
-
+*/
 
