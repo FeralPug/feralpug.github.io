@@ -69,7 +69,177 @@ link.appendChild(pic);
 list.appendChild(entry);
 */
 
-//do first link
+//Do the first link
+
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://github.com/FeralPug/VectorSwizzle");
+link.setAttribute("title", "Link to the tool github");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/Tools/VectorSwizzle.png";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of example code");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//2nd
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/Xmy504dTwoY");
+link.setAttribute("title", "Link to video demo of Render Feature");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/Pixilation_Moment.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the render feature");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//3rd
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/6uKpv0GHE4Q");
+link.setAttribute("title", "Link to video demo of Render Feature");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/Outlines_Moment.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the render feature");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//4th
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/P1TR0eXNIUY");
+link.setAttribute("title", "Link to video demo of VFX");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/WapEffect_Moment.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the VFX");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//5th
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/hOIUUHDHCEg");
+link.setAttribute("title", "Link to video demo of the shader");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/LiquidShader_Moment.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the shader");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//6th
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/aoDp3kHo4TM");
+link.setAttribute("title", "Link to video demo of the shader");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/Cyclone2_Moment.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the shader");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//7th
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/dzWn9SbzVnM");
+link.setAttribute("title", "Link to video demo of the Render Feature");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/SobelEdgeDetection_Moment.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the Render Feature");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+
+//8th
 
 entry = document.createElement("li");
 
@@ -90,129 +260,6 @@ if (relDir !== 0) {
 pic = document.createElement("img");
 pic.setAttribute("src", src);
 pic.setAttribute("alt", "Screenshot of the game Hyper Flight");
-link.appendChild(pic);
-
-list.appendChild(entry);
-
-//second li
-
-var entry = document.createElement("li");
-
-var link = document.createElement("a");
-link.setAttribute("href", "https://github.com/FeralPug/GradientMakerTool");
-link.setAttribute("title", "Link to the tool github");
-link.setAttribute("target", "_blank");
-entry.appendChild(link);
-
-var src = "Media/RecentPosts/Gradient1.png";
-
-if(relDir !== 0) {
-    for (var i = 0; i < relDir; i++) {
-        src = "../" + src;
-    }   
-}
-
-var pic = document.createElement("img");
-pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot of the tool UI");
-link.appendChild(pic);
-
-list.appendChild(entry);
-
-//make the three
-
-entry = document.createElement("li");
-
-link = document.createElement("a");
-link.setAttribute("href", "https://feralpug.github.io/OtherPages/Code/Pages/TrajectoryPredictions/TrajectoryPrediction.html");
-link.setAttribute("title", "Link to blog post");
-entry.appendChild(link);
-
-src = "Media/RecentPosts/TrajectoryThumb.png";
-
-if (relDir !== 0) {
-    for (var i = 0; i < relDir; i++) {
-        src = "../" + src;
-    }
-}
-
-pic = document.createElement("img");
-pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot of the Trajectory Predictions");
-link.appendChild(pic);
-
-list.appendChild(entry);
-
-//make the four
-
-entry = document.createElement("li");
-
-link = document.createElement("a");
-link.setAttribute("href", "https://feral-pug.itch.io/bayer-worlds");
-link.setAttribute("title", "Link to the Bayer Worlds itch.io page");
-link.setAttribute("target", "_blank");
-entry.appendChild(link);
-
-src = "Media/RecentPosts/BayerWorldsThumb.jpg";
-
-if (relDir !== 0) {
-    for (var i = 0; i < relDir; i++) {
-        src = "../" + src;
-    }
-}
-
-pic = document.createElement("img");
-pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot from the game Bayer Worlds");
-link.appendChild(pic);
-
-list.appendChild(entry);
-
-//make the five
-
-entry = document.createElement("li");
-
-link = document.createElement("a");
-link.setAttribute("href", "https://feralpug.github.io/OtherPages/Code/Pages/ExtendingUnitySkybox/ExtendingSkybox.html");
-link.setAttribute("title", "Link to the shader write up");
-entry.appendChild(link);
-
-src = "Media/RecentPosts/ExtendingSkyboxThumb.png";
-
-if (relDir !== 0) {
-    for (var i = 0; i < relDir; i++) {
-        src = "../" + src;
-    }
-}
-
-pic = document.createElement("img");
-pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot of the final shader");
-link.appendChild(pic);
-
-list.appendChild(entry);
-
-//make the six
-
-entry = document.createElement("li");
-
-link = document.createElement("a");
-link.setAttribute("href", "https://github.com/FeralPug/TextureArrayMakerTool");
-link.setAttribute("title", "Link to the tool github");
-link.setAttribute("target", "_blank");
-entry.appendChild(link);
-
-src = "Media/RecentPosts/TextureArrayMakerTool.jpg";
-
-if (relDir !== 0) {
-    for (var i = 0; i < relDir; i++) {
-        src = "../" + src;
-    }
-}
-
-pic = document.createElement("img");
-pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot of the tool UI");
 link.appendChild(pic);
 
 list.appendChild(entry);
