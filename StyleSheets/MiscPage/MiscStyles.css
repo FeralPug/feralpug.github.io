@@ -34,13 +34,14 @@
     display: flex;
     align-content: center;
     justify-content: space-around;
+
 }
 
-    .DirectoryItemImage img {
-        width: 256px;
-        min-width: 128px;
-        max-width: 100%;
-    }
+.DirectoryItemImage img {
+    display: inline-block;
+    min-width: 128px;
+    max-width: 560px;
+}
 
 .DirectoryItemIcon {
     display: flex;
@@ -48,9 +49,9 @@
     justify-content: space-around;
 }
 
-    .DirectoryItemIcon img {
-        width: 128px;
-    }
+.DirectoryItemIcon img {
+    width: 128px;
+}
 
 /*
     then we set the texts
@@ -58,16 +59,22 @@
 
 .DirectoryItemText {
     margin: 0px 5px;
+    text-align: center;
+    justify-content: center;
+
 }
 
 .DirectoryContainer h3 {
     margin-top: 10px;
     margin-bottom: 10px;
-    text-align: center;
+    
 }
 
 .DirectoryItemText p {
-    margin: 0px;
+    /*margin: 0px;*/
+    text-align: left;
+    max-width: 75%;  
+    display: inline-block;
 }
 
 /*

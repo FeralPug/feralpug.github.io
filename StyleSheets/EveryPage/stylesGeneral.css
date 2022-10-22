@@ -257,6 +257,7 @@ main h1{
     */
     justify-items: center;
     margin: 20px 50px;
+    max-width: 75%; /* added*/
 }
 
 .PageImage {
@@ -294,6 +295,8 @@ main h1{
 .PageText {
     padding-left: 20px;
     padding-right: 20px;
+    margin: 20px; /* added*/
+    max-width: 75%; /* added*/
 }
 
 article a {
