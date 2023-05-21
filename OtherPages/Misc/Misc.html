@@ -80,15 +80,31 @@
                 <ul>
                     <li>
                         <div class="DirectoryItemImage">
-                            <iframe width="560" height="315" src="https://www.youtube.com/embed/Xmy504dTwoY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                        </div>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/qoPMH4xQrQ8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>                        </div>
+                        <div class="DirectoryItemText">
+                            <h3>
+                                Post Processing Stack for OpenGL Renderer
+                            </h3>
+                            <p>
+                                I added post processing to the cameras in my OpenGl renderer. It uses frame buffers and off screen rendering to 
+                                draw the scene into a color texture. From there the camera can ping pong that color texture to any number of
+                                other textures while using different shaders to apply post processing. In this video I have the camera apply
+                                a blur effect and then a grayscale effect to show off this feature.
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="DirectoryItemImage">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/Xmy504dTwoY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
                         <div class="DirectoryItemText">
                             <h3>
                                 Pixilation Render Feature for Unity URP
                             </h3>
                             <p>
-                                A render feature that creates pixilated rendering for selective objects in the scene. 
+                                A render feature that creates pixilated rendering for selective objects in the scene.
                                 It works by rendering the selected object meshes to a render texture and then down sampling
-                                that image before rendering back to the camera color target. Each pixilated pixel is zoomed 
+                                that image before rendering back to the camera color target. Each pixilated pixel is zoomed
                                 in the shader to create the pixilated effect.
                             </p>
                         </div>

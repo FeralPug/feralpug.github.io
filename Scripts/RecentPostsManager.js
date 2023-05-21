@@ -71,6 +71,30 @@ list.appendChild(entry);
 
 //Do the first link
 
+//new 1st
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://youtu.be/qoPMH4xQrQ8");
+link.setAttribute("title", "Link to video demo of renderer");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/PostProcCapture.jpg";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Screenshot of the render feature");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -240,7 +264,7 @@ list.appendChild(entry);
 
 
 //8th
-
+/*
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -263,7 +287,7 @@ pic.setAttribute("alt", "Screenshot of the game Hyper Flight");
 link.appendChild(pic);
 
 list.appendChild(entry);
-
+*/
 //make the seven
 
 /*
