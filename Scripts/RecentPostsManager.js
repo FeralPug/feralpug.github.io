@@ -71,7 +71,30 @@ list.appendChild(entry);
 
 //Do the first link
 
-//new 1st
+entry = document.createElement("li");
+
+link = document.createElement("a");
+link.setAttribute("href", "https://feral-pug.itch.io/living-hellscape");
+link.setAttribute("title", "Link to itch.io page for the game");
+link.setAttribute("target", "_blank");
+entry.appendChild(link);
+
+src = "Media/RecentPosts/LivingHellscapeCapture.png";
+
+if (relDir !== 0) {
+    for (var i = 0; i < relDir; i++) {
+        src = "../" + src;
+    }
+}
+
+pic = document.createElement("img");
+pic.setAttribute("src", src);
+pic.setAttribute("alt", "Logo for the game");
+link.appendChild(pic);
+
+list.appendChild(entry);
+
+//2nd
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -90,35 +113,12 @@ if (relDir !== 0) {
 
 pic = document.createElement("img");
 pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot of the render feature");
+pic.setAttribute("alt", "Screenshot of the OpenGL Renderer");
 link.appendChild(pic);
 
 list.appendChild(entry);
 
-entry = document.createElement("li");
-
-link = document.createElement("a");
-link.setAttribute("href", "https://github.com/FeralPug/VectorSwizzle");
-link.setAttribute("title", "Link to the tool github");
-link.setAttribute("target", "_blank");
-entry.appendChild(link);
-
-src = "Media/Tools/VectorSwizzle.png";
-
-if (relDir !== 0) {
-    for (var i = 0; i < relDir; i++) {
-        src = "../" + src;
-    }
-}
-
-pic = document.createElement("img");
-pic.setAttribute("src", src);
-pic.setAttribute("alt", "Screenshot of example code");
-link.appendChild(pic);
-
-list.appendChild(entry);
-
-//2nd
+//3rd
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -142,7 +142,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//3rd
+//4th
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -166,7 +166,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//4th
+//5th
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -190,7 +190,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//5th
+//6th
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -214,7 +214,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//6th
+//7th
 entry = document.createElement("li");
 
 link = document.createElement("a");
@@ -238,7 +238,7 @@ link.appendChild(pic);
 
 list.appendChild(entry);
 
-//7th
+//8th
 entry = document.createElement("li");
 
 link = document.createElement("a");
