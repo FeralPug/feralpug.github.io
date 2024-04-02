@@ -317,7 +317,7 @@ article a:hover{
 
 .AsideContainer {
     display: flex;
-    align-content: center;
+    /*align-content: center; this set the aside to stick in the middle of the page BAD*/
     justify-content: space-around;
 }
 
